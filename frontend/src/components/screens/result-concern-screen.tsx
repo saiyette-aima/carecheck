@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "@/config"
 import { AlertCircle, Heart, Volume2, MapPin, ShieldCheck, HelpCircle } from "lucide-react"
 import { useState } from "react"
+import { Translate } from "@/components/translate"
+import { translateDynamicText } from "@/lib/translations"
 
 export function ResultConcernScreen() {
-  const { addCheck, currentResponses, language } = useApp()
+  const { addCheck, currentResponses, language, t } = useApp()
   const navigate = useNavigate()
   const [playingSummary, setPlayingSummary] = useState(false)
 
@@ -22,10 +24,11 @@ export function ResultConcernScreen() {
     if (playingSummary) return
     setPlayingSummary(true)
     try {
+      const translatedText = await translateDynamicText(latestSummary, language)
       const response = await fetch(`${API_BASE_URL}/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: latestSummary, lang: language })
+        body: JSON.stringify({ text: translatedText, lang: language })
       })
       if (response.ok) {
         const blob = await response.blob()
@@ -56,20 +59,20 @@ export function ResultConcernScreen() {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl lg:text-4xl font-extrabold text-foreground mb-3">
-            Let's Get You Checked
+            {t("res.concernTitle")}
           </h1>
           <p className="text-muted-foreground text-lg">
-            We found something to discuss with a doctor
+            {t("res.concernSub")}
           </p>
         </div>
 
         {/* AI summary report card */}
         <div className="glass-card rounded-xl p-6 border border-border/80 mb-6 bg-secondary/10">
           <p className="text-[11px] uppercase tracking-wider text-primary font-bold mb-2 flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4" /> AI Checkup Summary
+            <ShieldCheck className="w-4 h-4" /> {t("res.aiSummary")}
           </p>
           <p className="text-sm text-foreground leading-relaxed italic">
-            "{latestSummary}"
+            "<Translate>{latestSummary}</Translate>"
           </p>
         </div>
 
@@ -80,10 +83,10 @@ export function ResultConcernScreen() {
               <Heart className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-foreground mb-1">
-                  Most changes are not serious
+                  {t("res.concernTip1Title")}
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  But it's important to get it checked by a doctor. They can give you peace of mind.
+                  {t("res.concernTip1Desc")}
                 </p>
               </div>
             </div>
@@ -93,7 +96,7 @@ export function ResultConcernScreen() {
             <div className="flex gap-3">
               <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground leading-relaxed">
-                Your findings will help the doctor understand what to look for. Come prepared to describe what you felt.
+                {t("res.concernTip2Desc")}
               </p>
             </div>
           </div>
@@ -107,7 +110,7 @@ export function ResultConcernScreen() {
         >
           <Volume2 className={`w-5 h-5 text-primary ${playingSummary ? "animate-bounce" : ""}`} />
           <span className="text-sm font-semibold text-foreground">
-            {playingSummary ? "Playing Audio..." : "Hear a summary"}
+            {playingSummary ? t("res.playingAudio") : t("res.hearSummary")}
           </span>
         </button>
 
@@ -118,13 +121,13 @@ export function ResultConcernScreen() {
             className="w-full h-14 gradient-primary text-white rounded-xl font-semibold text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
           >
             <MapPin className="w-5 h-5" />
-            Find a Clinic
+            {t("res.findClinic")}
           </button>
           <button
             onClick={() => navigate("/progress")}
             className="w-full h-12 bg-secondary hover:bg-muted text-foreground rounded-xl font-medium transition-all"
           >
-            Skip for Now
+            {t("res.skip")}
           </button>
         </div>
       </div>

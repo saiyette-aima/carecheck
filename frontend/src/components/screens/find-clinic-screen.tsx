@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "@/config"
 import { MapPin, Phone, ExternalLink, ArrowLeft, Clock, Users, Star, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useApp } from "../app-context"
+import { Translate } from "@/components/translate"
 
 interface Clinic {
   id: string
@@ -18,13 +20,14 @@ interface Clinic {
 
 export function FindClinicScreen() {
   const navigate = useNavigate()
+  const { t } = useApp()
   const [clinics, setClinics] = useState<Clinic[]>([])
   const [loading, setLoading] = useState(true)
-  const [statusMessage, setStatusMessage] = useState("Acquiring your location...")
+  const [statusMessage, setStatusMessage] = useState(() => t("clinic.acquiring"))
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setStatusMessage("Geolocation is not supported by your browser.")
+      setStatusMessage(t("clinic.unsupported", "Geolocation is not supported by your browser."))
       fetchFallbackClinics()
       return
     }
@@ -38,7 +41,7 @@ export function FindClinicScreen() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords
-        setStatusMessage("Fetching clinics near you...")
+        setStatusMessage(t("clinic.fetching"))
         try {
           const response = await fetch(`${API_BASE_URL}/nearby_clinics`, {
             method: "POST",
@@ -63,13 +66,13 @@ export function FindClinicScreen() {
       (geoError) => {
         console.warn("Geolocation warning/error:", geoError)
         if (geoError.code === 1) {
-          setStatusMessage("Location permission denied. Determining location...")
+          setStatusMessage(t("clinic.denied"))
         } else if (geoError.code === 2) {
-          setStatusMessage("Location unavailable. Determining location...")
+          setStatusMessage(t("clinic.unavailable"))
         } else if (geoError.code === 3) {
-          setStatusMessage("Location request timed out. Determining location...")
+          setStatusMessage(t("clinic.timeout"))
         } else {
-          setStatusMessage("Could not retrieve location. Determining location...")
+          setStatusMessage(t("clinic.failed"))
         }
         fetchFallbackClinics()
       },
@@ -89,7 +92,7 @@ export function FindClinicScreen() {
           lat = ipData.latitude
           lng = ipData.longitude
           console.log(`[Clinics] Resolved IP coordinates fallback: ${lat}, ${lng} (${ipData.cityName || ""})`)
-          setStatusMessage(`Fetching clinics in ${ipData.cityName || "your area"}...`)
+          setStatusMessage(t("clinic.fetchingFallback"))
         }
       }
     } catch (ipErr) {
@@ -113,22 +116,22 @@ export function FindClinicScreen() {
       setClinics([
         {
           id: "1",
-          name: "Central Health Clinic (Offline Fallback)",
+          name: t("clinic.fallback1Name", "Central Health Clinic (Offline Fallback)"),
           distance: "1.5 km",
-          address: "123 Main Street, Health Center",
+          address: t("clinic.fallback1Addr", "123 Main Street, Health Center"),
           phone: "+1 (555) 123-4567",
           hours: "Mon-Fri 8am-6pm",
-          availability: "Available today",
+          availability: t("clinic.availableToday"),
           rating: 4.8,
         },
         {
           id: "2",
-          name: "Women's Care Center (Offline Fallback)",
+          name: t("clinic.fallback2Name", "Women's Care Center (Offline Fallback)"),
           distance: "3.2 km",
-          address: "456 Oak Avenue, Medical Plaza",
+          address: t("clinic.fallback2Addr", "456 Oak Avenue, Medical Plaza"),
           phone: "+1 (555) 234-5678",
           hours: "Mon-Sat 9am-5pm",
-          availability: "Tomorrow morning",
+          availability: t("clinic.tomorrowMorning", "Tomorrow morning"),
           rating: 4.9,
         }
       ])
@@ -146,14 +149,14 @@ export function FindClinicScreen() {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back</span>
+          <span className="text-sm font-medium">{t("lang.back")}</span>
         </button>
 
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">
-          Find a Clinic
+          {t("clinic.title")}
         </h1>
         <p className="text-muted-foreground">
-          Nearby healthcare providers offering breast health services
+          {t("clinic.sub")}
         </p>
       </div>
 
@@ -184,7 +187,7 @@ export function FindClinicScreen() {
                   {/* Name and rating */}
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="font-bold text-foreground text-lg">
-                      {clinic.name}
+                      <Translate>{clinic.name}</Translate>
                     </h3>
                     <div className="flex items-center gap-1 text-sm text-warning">
                       <Star className="w-4 h-4 fill-warning" />
@@ -194,22 +197,22 @@ export function FindClinicScreen() {
 
                   {/* Availability badge */}
                   <span className="inline-flex text-xs font-medium bg-success/15 text-success px-2.5 py-1 rounded-full mb-3">
-                    {clinic.availability}
+                    <Translate>{clinic.availability}</Translate>
                   </span>
 
                   {/* Details */}
                   <div className="space-y-2 mb-5 text-sm text-muted-foreground">
                     <p className="flex items-start gap-2">
                       <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                      {clinic.address}
+                      <Translate>{clinic.address}</Translate>
                     </p>
                     <p className="flex items-center gap-2">
                       <Clock className="w-4 h-4 flex-shrink-0" />
-                      {clinic.hours}
+                      <Translate>{clinic.hours}</Translate>
                     </p>
                     <p className="flex items-center gap-2">
                       <Users className="w-4 h-4 flex-shrink-0" />
-                      Women's health specialists
+                      {t("clinic.specialists")}
                     </p>
                   </div>
 
@@ -220,14 +223,14 @@ export function FindClinicScreen() {
                       className="flex-1 py-3 gradient-primary text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20"
                     >
                       <Phone className="w-4 h-4" />
-                      Call
+                      {t("clinic.call")}
                     </a>
                     <button
                       onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.name + " " + clinic.address)}`, "_blank")}
                       className="flex-1 py-3 bg-secondary hover:bg-muted text-foreground rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-md"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      Directions
+                      {t("clinic.directions")}
                     </button>
                   </div>
                 </div>
@@ -236,7 +239,7 @@ export function FindClinicScreen() {
           </div>
 
           {clinics.length === 0 && (
-            <p className="text-center text-muted-foreground py-10">No clinics found within search range.</p>
+            <p className="text-center text-muted-foreground py-10">{t("clinic.noClinics")}</p>
           )}
         </>
       )}
@@ -247,7 +250,7 @@ export function FindClinicScreen() {
           onClick={() => navigate("/progress")}
           className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
         >
-          Continue to Progress
+          {t("clinic.continueProgress")}
         </button>
       </div>
     </div>

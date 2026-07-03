@@ -1,13 +1,15 @@
 "use client"
 
 import { QuestionScreen } from "./question-screen"
+import { useApp } from "../app-context"
 
 export function Question3Screen() {
+  const { t } = useApp()
   return (
     <QuestionScreen
       questionNumber={3}
-      title="Did anything feel different from before?"
-      subtitle="Trust your body. Any new sensation matters."
+      title={t("q.q3Title")}
+      subtitle={t("q.q3Sub")}
     />
   )
 }

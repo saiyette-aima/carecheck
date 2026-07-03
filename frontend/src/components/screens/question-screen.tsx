@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "@/config"
 import { Volume2, Check, ThumbsDown, ThumbsUp, Mic, Square, RotateCcw, Loader2, Pause } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import { Translate } from "@/components/translate"
 
 interface QuestionScreenProps {
   questionNumber: 1 | 2 | 3
@@ -13,7 +14,7 @@ interface QuestionScreenProps {
 }
 
 export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScreenProps) {
-  const { currentResponses, setCurrentResponses, userId, refreshHistory, language } = useApp()
+  const { currentResponses, setCurrentResponses, userId, refreshHistory, language, t } = useApp()
   const navigate = useNavigate()
   const responseKeys = ["lump", "painOrDischarge", "different"] as const
   const currentKey = responseKeys[questionNumber - 1]
@@ -124,7 +125,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
       }, 1000)
     } catch (err) {
       console.error("Mic access denied or error:", err)
-      alert("Microphone access is required to record your response.")
+      alert(t("doc.micRequired"))
     }
   }
 
@@ -162,11 +163,11 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
           [currentKey]: true // Mark as answered/has content
         })
       } else {
-        alert("Transcription failed. Please try again or type/use buttons.")
+        alert(t("q.transcribeFailed", "Transcription failed. Please try again or type/use buttons."))
       }
     } catch (e) {
       console.error(e)
-      alert("Failed to connect to transcription server.")
+      alert(t("q.noConnect", "Failed to connect to transcription server."))
     } finally {
       setTranscribing(false)
     }
@@ -196,7 +197,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
       await proceedToNext(newResponses)
     } catch (e) {
       console.error(e)
-      alert("Failed to submit response.")
+      alert(t("q.failedSubmit", "Failed to submit response."))
     } finally {
       setTranscribing(false)
     }
@@ -269,7 +270,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
         }
       } catch (err) {
         console.error(err)
-        alert("Failed to analyze responses. Proceeding to default result.")
+        alert(t("q.failedAnalyze", "Failed to analyze responses. Proceeding to default result."))
         navigate("/result-ok")
       } finally {
         setAnalyzing(false)
@@ -287,9 +288,9 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
           <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto animate-glow-pulse">
             <Loader2 className="w-12 h-12 text-primary animate-spin" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Analyzing Your Checkup</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("q.analyzing")}</h1>
           <p className="text-muted-foreground leading-relaxed text-sm">
-            AI is compiling your voice transcripts and generating a personalized report. This takes a moment...
+            {t("q.analyzingDesc")}
           </p>
         </div>
       </div>
@@ -328,7 +329,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
         {/* Question card */}
         <div className="glass-card rounded-2xl p-8 lg:p-10 text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
-            Question {questionNumber} of 3
+            {t("q.question")} {questionNumber} {t("exam.of")} 3
           </div>
 
           <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mx-auto mb-6">
@@ -352,14 +353,14 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
             ) : (
               <Volume2 className="w-4 h-4 text-primary" />
             )}
-            {playingQuestion ? "Playing..." : "Tap to listen"}
+            {playingQuestion ? t("q.playing") : t("q.tapListen")}
           </button>
 
           {/* Transcription details */}
           {transcribing ? (
             <div className="flex flex-col items-center gap-3 py-6">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-sm text-muted-foreground">Processing your answer...</p>
+              <p className="text-sm text-muted-foreground">{t("q.processing")}</p>
             </div>
           ) : isRecording ? (
             <div className="flex flex-col items-center gap-4 py-6">
@@ -372,18 +373,18 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
                 </button>
               </div>
               <span className="text-sm font-mono text-warning font-semibold">{formatTime(recordingTime)}</span>
-              <p className="text-xs text-muted-foreground">Tap square to stop speaking</p>
+              <p className="text-xs text-muted-foreground">{t("q.tapStop")}</p>
             </div>
           ) : transcriptText ? (
             <div className="bg-secondary/35 rounded-xl p-4 mb-8 text-left border border-border/60">
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Speech Answer</p>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">{t("q.speechAnswer")}</p>
               <p className="text-sm text-foreground leading-relaxed italic">"{transcriptText}"</p>
               <div className="flex justify-end gap-2 mt-4">
                 <button
                   onClick={startRecording}
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" /> Speak Again
+                  <RotateCcw className="w-3.5 h-3.5" /> {t("q.speakAgain")}
                 </button>
               </div>
             </div>
@@ -398,7 +399,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
                 </div>
               </button>
               <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-                Tap the microphone to speak your answer in any language.
+                {t("q.micHint")}
               </p>
             </div>
           )}
@@ -411,7 +412,7 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
                   onClick={handleContinueVoice}
                   className="w-full h-14 gradient-primary text-white rounded-xl font-bold flex items-center justify-center shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.01] transition-all duration-200"
                 >
-                  Continue
+                  {t("q.continue")}
                 </button>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
@@ -420,14 +421,14 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
                     className="py-4 bg-secondary hover:bg-success/15 hover:border-success/30 text-foreground border border-transparent rounded-xl font-semibold text-base flex flex-col items-center justify-center gap-1.5 transition-all"
                   >
                     <ThumbsDown className="w-5 h-5 text-muted-foreground" />
-                    No
+                    {t("q.no")}
                   </button>
                   <button
                     onClick={() => handleButtonResponse(true)}
                     className="py-4 bg-secondary hover:bg-warning/15 hover:border-warning/30 text-foreground border border-transparent rounded-xl font-semibold text-base flex flex-col items-center justify-center gap-1.5 transition-all"
                   >
                     <ThumbsUp className="w-5 h-5 text-muted-foreground" />
-                    Yes
+                    {t("q.yes")}
                   </button>
                 </div>
               )}

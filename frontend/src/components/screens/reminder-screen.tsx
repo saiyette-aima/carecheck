@@ -13,7 +13,7 @@ const timeOptions = [
 
 export function ReminderScreen() {
   const navigate = useNavigate()
-  const { userSettings, saveReminder } = useApp()
+  const { userSettings, saveReminder, language, t } = useApp()
 
   const [selectedTime, setSelectedTime] = useState("morning")
   const [selectedDay, setSelectedDay] = useState(15)
@@ -53,7 +53,7 @@ export function ReminderScreen() {
   }
 
   const nextCheckDate = getNextCheckDate(selectedDay)
-  const monthName = nextCheckDate.toLocaleDateString("en-US", { month: "long" })
+  const monthName = nextCheckDate.toLocaleDateString(language === "hi" ? "hi-IN" : language === "ar" ? "ar-EG" : "en-US", { month: "long" })
   const dayNum = nextCheckDate.getDate()
   const yearNum = nextCheckDate.getFullYear()
 
@@ -64,7 +64,7 @@ export function ReminderScreen() {
     if (success) {
       navigate("/dashboard")
     } else {
-      alert("Failed to save reminder. Please try again.")
+      alert(t("rem.failedSave"))
     }
   }
 
@@ -74,10 +74,10 @@ export function ReminderScreen() {
         {/* Header */}
         <div className="mb-8 animate-fade-in-up">
           <button onClick={() => navigate("/dashboard")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors">
-            <ChevronLeft className="w-4 h-4" /><span className="text-sm font-medium">Back</span>
+            <ChevronLeft className="w-4 h-4" /><span className="text-sm font-medium">{t("lang.back")}</span>
           </button>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">Reminders</h1>
-          <p className="text-muted-foreground">Set up your monthly check reminder</p>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">{t("rem.title")}</h1>
+          <p className="text-muted-foreground">{t("rem.sub")}</p>
         </div>
 
         {/* Next check date card */}
@@ -85,14 +85,16 @@ export function ReminderScreen() {
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-5 shadow-lg shadow-primary/20">
             <Bell className="w-8 h-8 text-white" />
           </div>
-          <p className="text-sm text-muted-foreground mb-1">Your next check is on</p>
-          <p className="text-4xl font-extrabold text-foreground tracking-tight">{monthName} {dayNum}</p>
+          <p className="text-sm text-muted-foreground mb-1">{t("rem.nextCheck")}</p>
+          <p className="text-4xl font-extrabold text-foreground tracking-tight">
+            {language === "ar" ? `${dayNum} ${monthName}` : `${monthName} ${dayNum}`}
+          </p>
           <p className="text-lg text-muted-foreground">{yearNum}</p>
         </div>
 
         {/* Day of Month selection */}
         <div className="mb-8 animate-fade-in-up" style={{animationDelay:"0.08s"}}>
-          <p className="text-base font-semibold text-foreground mb-4 font-medium">Preferred Day of the Month</p>
+          <p className="text-base font-semibold text-foreground mb-4 font-medium">{t("rem.preferredDay")}</p>
           <div className="grid grid-cols-7 gap-2 max-w-sm mx-auto p-4 rounded-2xl bg-card border border-border">
             {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => {
               const isSelected = selectedDay === day
@@ -116,7 +118,7 @@ export function ReminderScreen() {
 
         {/* Time selection */}
         <div className="mb-8 animate-fade-in-up" style={{animationDelay:"0.1s"}}>
-          <p className="text-base font-semibold text-foreground mb-4">Preferred Time of Day</p>
+          <p className="text-base font-semibold text-foreground mb-4">{t("rem.preferredTime")}</p>
           <div className="space-y-3 stagger-children">
             {timeOptions.map((option) => {
               const Icon = option.icon
@@ -128,8 +130,10 @@ export function ReminderScreen() {
                     <Icon className={`w-5 h-5 ${isSelected ? "text-white" : "text-muted-foreground"}`} />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="text-base font-semibold text-foreground">{option.label} — {option.time}</p>
-                    <p className="text-sm text-muted-foreground">{option.desc}</p>
+                    <p className="text-base font-semibold text-foreground">
+                      {t(`rem.${option.id}`)} — {option.time}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{t(`rem.${option.id}Desc`)}</p>
                   </div>
                   {isSelected && (
                     <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center shadow-sm">
@@ -150,8 +154,8 @@ export function ReminderScreen() {
               <Volume2 className={`w-5 h-5 ${voiceReminder ? "text-primary" : "text-muted-foreground"}`} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-base font-semibold text-foreground">Voice Reminder</p>
-              <p className="text-sm text-muted-foreground">Audio notification in your language</p>
+              <p className="text-base font-semibold text-foreground">{t("rem.voiceReminder")}</p>
+              <p className="text-sm text-muted-foreground">{t("rem.voiceDesc")}</p>
             </div>
             <div className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${voiceReminder ? "bg-primary" : "bg-muted"}`}>
               <div className={`w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${voiceReminder ? "translate-x-6" : "translate-x-0"}`} />
@@ -163,7 +167,7 @@ export function ReminderScreen() {
         <button onClick={handleSave} disabled={loading}
           className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-75">
           {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-          Save Reminder
+          {t("rem.save")}
         </button>
       </div>
     </div>

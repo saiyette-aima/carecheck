@@ -8,7 +8,7 @@ import { API_BASE_URL } from "@/config"
 
 export function LoginScreen() {
   const navigate = useNavigate()
-  const { setUserId } = useApp()
+  const { setUserId, t, language } = useApp()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -22,7 +22,7 @@ export function LoginScreen() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email, password, language: "en" })
+        body: JSON.stringify({ email, password, language })
       })
       const data = await response.json()
       if (response.ok) {
@@ -75,26 +75,26 @@ export function LoginScreen() {
 
         <div className="text-center animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
           <h1 className="text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight mb-2">
-            CareCheck
+            {t("login.title")}
           </h1>
           <p className="text-muted-foreground text-base lg:text-lg max-w-md">
-            Your trusted breast health companion — guided self-exams, tracking, and peace of mind.
+            {t("login.subtitle")}
           </p>
         </div>
 
         {/* Feature pills — hidden on mobile, shown on large */}
         <div className="hidden lg:flex gap-3 mt-10 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
           {[
-            { icon: Shield, text: "Private & Secure" },
-            { icon: Clock, text: "5-Min Monthly Check" },
-            { icon: Sparkles, text: "AI-Guided Steps" },
+            { icon: Shield, key: "login.secure" },
+            { icon: Clock, key: "login.fiveMin" },
+            { icon: Sparkles, key: "login.aiGuided" },
           ].map((f) => (
             <div
-              key={f.text}
+              key={f.key}
               className="flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm font-medium text-foreground"
             >
               <f.icon className="w-4 h-4 text-primary" />
-              {f.text}
+              {t(f.key)}
             </div>
           ))}
         </div>
@@ -106,10 +106,10 @@ export function LoginScreen() {
           {/* Welcome text */}
           <div className="text-center lg:text-left mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-              Welcome
+              {t("login.welcome")}
             </h2>
             <p className="text-muted-foreground">
-              Sign in to continue your health journey
+              {t("login.welcomeSub")}
             </p>
           </div>
 
@@ -123,7 +123,7 @@ export function LoginScreen() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email address"
+                    placeholder={t("login.email")}
                     className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
                     required
                   />
@@ -134,7 +134,7 @@ export function LoginScreen() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
+                    placeholder={t("login.password")}
                     className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
                     required
                   />
@@ -146,13 +146,13 @@ export function LoginScreen() {
                 disabled={loading}
                 className="w-full h-14 gradient-primary text-white rounded-xl flex items-center justify-center gap-3 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? t("login.signingIn") : t("login.signIn")}
               </button>
             </form>
 
             <div className="relative flex items-center py-4">
               <div className="flex-grow border-t border-border"></div>
-              <span className="flex-shrink-0 mx-4 text-xs text-muted-foreground">or</span>
+              <span className="flex-shrink-0 mx-4 text-xs text-muted-foreground">{t("login.or")}</span>
               <div className="flex-grow border-t border-border"></div>
             </div>
 
@@ -162,13 +162,13 @@ export function LoginScreen() {
               className="w-full h-14 bg-card border border-border text-foreground rounded-xl flex items-center justify-center gap-3 text-base font-medium hover:bg-secondary hover:border-primary/20 hover:shadow-md active:scale-[0.98] transition-all duration-200"
             >
               <User className="w-5 h-5 text-muted-foreground" />
-              Continue as Guest
+              {t("login.guest")}
             </button> */}
           </div>
 
           {/* Privacy note */}
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            Your data stays on your device. We never share your health information.
+            {t("login.privacy")}
           </p>
         </div>
       </div>

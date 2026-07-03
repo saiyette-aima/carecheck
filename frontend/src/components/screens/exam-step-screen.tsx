@@ -214,7 +214,7 @@ function StepIllustration({ type }: { type: string }) {
 }
 
 export function ExamStepScreen() {
-  const { examStep, setExamStep, language } = useApp()
+  const { examStep, setExamStep, language, t } = useApp()
   const navigate = useNavigate()
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
@@ -300,9 +300,9 @@ export function ExamStepScreen() {
             <X className="w-5 h-5 text-foreground" />
           </button>
           <div>
-            <p className="text-xs font-medium text-primary uppercase tracking-wider">Self-Check Exam</p>
+            <p className="text-xs font-medium text-primary uppercase tracking-wider">{t("exam.title")}</p>
             <h1 className="text-xl font-bold text-foreground">
-              Step {examStep} of {examSteps.length}
+              {t("exam.step")} {examStep} {t("exam.of")} {examSteps.length}
             </h1>
           </div>
         </div>
@@ -357,10 +357,10 @@ export function ExamStepScreen() {
 
               <div>
                 <h2 className="text-xl font-bold text-foreground mb-1">
-                  {currentStep.title}
+                  {t(`exam.step${currentStep.id}Title`)}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {currentStep.description}
+                  {t(`exam.step${currentStep.id}Desc`)}
                 </p>
               </div>
             </div>
@@ -389,14 +389,14 @@ export function ExamStepScreen() {
               className="flex-1 h-14 bg-secondary hover:bg-muted text-foreground rounded-xl flex items-center justify-center gap-2 text-base font-semibold transition-all duration-200 hover:shadow-md"
             >
               <RotateCcw className="w-5 h-5" />
-              Repeat
+              {t("exam.repeat")}
             </button>
 
             <button
               onClick={handleNext}
               className="flex-[2] h-14 gradient-primary text-white rounded-xl flex items-center justify-center gap-2 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
-              {isLastStep ? "Done" : "Next"}
+              {isLastStep ? t("exam.done") : t("exam.next")}
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>

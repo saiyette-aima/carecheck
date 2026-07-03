@@ -12,23 +12,25 @@ import {
   X,
 } from "lucide-react"
 import { useState } from "react"
+import { useApp } from "./app-context"
 
 interface LayoutProps {
   children: ReactNode
 }
 
 const navItems = [
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/exam-step", label: "Self-Check", icon: Activity },
-  { path: "/progress", label: "Progress", icon: BarChart3 },
-  { path: "/find-clinic", label: "Find Clinic", icon: MapPin },
-  { path: "/reminder", label: "Reminders", icon: Bell },
+  { path: "/dashboard", key: "nav.dashboard", icon: LayoutDashboard },
+  { path: "/exam-step", key: "nav.selfCheck", icon: Activity },
+  { path: "/progress", key: "nav.progress", icon: BarChart3 },
+  { path: "/find-clinic", key: "nav.findClinic", icon: MapPin },
+  { path: "/reminder", key: "nav.reminders", icon: Bell },
 ]
 
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { t, setLanguage, setUserId } = useApp()
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -44,10 +46,10 @@ export function Layout({ children }: LayoutProps) {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight font-[var(--font-heading)]">
-              CareCheck
+              {t("login.title")}
             </h1>
             <p className="text-[11px] text-muted-foreground -mt-0.5">
-              Health Companion
+              {t("layout.companion")}
             </p>
           </div>
         </div>
@@ -72,7 +74,7 @@ export function Layout({ children }: LayoutProps) {
                     isActive ? "" : "group-hover:scale-110"
                   }`}
                 />
-                {item.label}
+                {t(item.key)}
               </button>
             )
           })}
@@ -82,18 +84,22 @@ export function Layout({ children }: LayoutProps) {
         <div className="px-4 pb-6 space-y-3">
           <div className="glass-card rounded-xl p-4">
             <p className="text-xs font-semibold text-foreground mb-1">
-              Monthly Reminder
+              {t("layout.reminderTitle")}
             </p>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Your next self-check is coming up. Stay consistent!
+              {t("layout.reminderDesc")}
             </p>
           </div>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => {
+              setUserId(null)
+              setLanguage("en")
+              navigate("/")
+            }}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            Sign Out
+            {t("nav.signOut")}
           </button>
         </div>
       </aside>
@@ -109,7 +115,7 @@ export function Layout({ children }: LayoutProps) {
               <Heart className="w-4 h-4 text-white fill-white/60" />
             </div>
             <span className="text-base font-bold tracking-tight">
-              CareCheck
+              {t("login.title")}
             </span>
           </div>
           <button
@@ -144,7 +150,7 @@ export function Layout({ children }: LayoutProps) {
                   }`}
                 >
                   <Icon className="w-[18px] h-[18px]" />
-                  {item.label}
+                  {t(item.key)}
                 </button>
               )
             })}

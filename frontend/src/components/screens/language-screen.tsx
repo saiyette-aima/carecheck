@@ -12,7 +12,7 @@ const languages = [
 ]
 
 export function LanguageScreen() {
-  const { setLanguage, language } = useApp()
+  const { setLanguage, language, t } = useApp()
   const navigate = useNavigate()
 
   const handleSelect = (code: string) => {
@@ -37,18 +37,18 @@ export function LanguageScreen() {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
-          <span className="text-sm font-medium">Back</span>
+          <span className="text-sm font-medium">{t("lang.back")}</span>
         </button>
 
         <div className="glass-card rounded-2xl p-8">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-foreground mb-2">
-              Choose Your Language
+              {t("lang.title")}
             </h1>
             <div className="flex items-center gap-2">
               <Volume2 className="w-4 h-4 text-primary" />
               <span className="text-sm text-muted-foreground">
-                Tap speaker to preview
+                {t("lang.sub")}
               </span>
             </div>
           </div>
@@ -96,7 +96,7 @@ export function LanguageScreen() {
             onClick={handleContinue}
             className="w-full h-14 gradient-primary text-white rounded-xl flex items-center justify-center text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
-            Continue
+            {t("lang.continue")}
           </button>
         </div>
       </div>

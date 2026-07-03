@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "@/config"
 import { Mic, Check, ArrowLeft, Volume2, Trash2, Square, Loader2 } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import { Translate } from "@/components/translate"
+import { translateDynamicText } from "@/lib/translations"
 
 export function DoctorFeedbackScreen() {
-  const { addDoctorFeedback, userId, language } = useApp()
+  const { addDoctorFeedback, userId, language, t } = useApp()
   const navigate = useNavigate()
 
   const [isRecording, setIsRecording] = useState(false)
@@ -54,7 +56,7 @@ export function DoctorFeedbackScreen() {
       }, 1000)
     } catch (e) {
       console.error(e)
-      alert("Microphone access is required to record feedback.")
+      alert(t("doc.micRequired", "Microphone access is required to record feedback."))
     }
   }
 
@@ -85,11 +87,11 @@ export function DoctorFeedbackScreen() {
         setAnalyzedAdvice(data.msg)
         setHasRecording(true)
       } else {
-        alert("Failed to analyze recording. Please try again.")
+        alert(t("doc.failedAnalyze", "Failed to analyze recording. Please try again."))
       }
     } catch (e) {
       console.error(e)
-      alert("Could not connect to analysis server.")
+      alert(t("doc.failedConnect", "Could not connect to analysis server."))
     } finally {
       setAnalyzing(false)
     }
@@ -99,10 +101,11 @@ export function DoctorFeedbackScreen() {
     if (playingAdvice || !analyzedAdvice) return
     setPlayingAdvice(true)
     try {
+      const translatedText = await translateDynamicText(analyzedAdvice, language)
       const response = await fetch(`${API_BASE_URL}/tts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: analyzedAdvice, lang: language })
+        body: JSON.stringify({ text: translatedText, lang: language })
       })
       if (response.ok) {
         const blob = await response.blob()
@@ -136,11 +139,11 @@ export function DoctorFeedbackScreen() {
     <div className="min-h-screen flex items-center justify-center p-6 lg:p-10">
       <div className="w-full max-w-lg animate-scale-in">
         <button onClick={() => navigate("/progress")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /><span className="text-sm font-medium">Back</span>
+          <ArrowLeft className="w-4 h-4" /><span className="text-sm font-medium">{t("lang.back")}</span>
         </button>
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">Doctor Feedback</h1>
-          <p className="text-muted-foreground">Record what the doctor said about your visit</p>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">{t("doc.title")}</h1>
+          <p className="text-muted-foreground">{t("doc.sub")}</p>
         </div>
         <div className="glass-card rounded-2xl p-8 mb-6">
           <div className="flex justify-center mb-6">
@@ -153,7 +156,7 @@ export function DoctorFeedbackScreen() {
               ) : analyzing ? (
                 <div className="flex flex-col items-center gap-2">
                   <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                  <span className="text-xs text-muted-foreground">Analyzing...</span>
+                  <span className="text-xs text-muted-foreground">{t("doc.processing")}</span>
                 </div>
               ) : hasRecording ? (
                 <div className="flex flex-col items-center gap-2"><Check className="w-14 h-14 text-success" /><span className="text-sm font-mono text-success font-semibold">{formatTime(recordingTime)}</span></div>
@@ -165,26 +168,26 @@ export function DoctorFeedbackScreen() {
               {Array.from({ length: 24 }).map((_, i) => (<div key={i} className={`w-1 rounded-full ${isRecording ? "bg-primary" : "bg-success"}`} style={{ animation: isRecording ? `wave-bar 0.8s ease-in-out infinite` : "none", animationDelay: isRecording ? `${i * 40}ms` : "0ms", height: isRecording ? undefined : `${12 + Math.random() * 24}px` }} />))}
             </div>
           )}
-          {!hasRecording && !isRecording && !analyzing && (<div className="bg-secondary/50 rounded-xl p-5 text-center"><p className="text-sm text-foreground leading-relaxed">Tell us what the doctor said. You can record up to 2 minutes.</p></div>)}
+          {!hasRecording && !isRecording && !analyzing && (<div className="bg-secondary/50 rounded-xl p-5 text-center"><p className="text-sm text-foreground leading-relaxed">{t("doc.micHint")}</p></div>)}
           
           {analyzedAdvice && (
             <div className="bg-secondary/20 rounded-xl p-5 border border-border/80 mb-6">
-              <p className="text-[11px] uppercase tracking-wider text-primary font-bold mb-2">Simplified Advice</p>
-              <p className="text-sm text-foreground leading-relaxed italic">"{analyzedAdvice}"</p>
+              <p className="text-[11px] uppercase tracking-wider text-primary font-bold mb-2">{t("doc.aiAnalysis")}</p>
+              <p className="text-sm text-foreground leading-relaxed italic">"<Translate>{analyzedAdvice}</Translate>"</p>
             </div>
           )}
           
           {hasRecording && analyzedAdvice && (
             <button onClick={handleHearAdvice} disabled={playingAdvice} className="w-full flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/15 rounded-xl py-3 transition-colors disabled:opacity-70">
               <Volume2 className={`w-5 h-5 text-primary ${playingAdvice ? "animate-bounce" : ""}`} />
-              <span className="text-sm font-semibold text-primary">{playingAdvice ? "Playing..." : "Play Advice Audio"}</span>
+              <span className="text-sm font-semibold text-primary">{playingAdvice ? t("q.playing") : t("doc.playAdviceAudio", "Play Advice Audio")}</span>
             </button>
           )}
         </div>
         <div className="space-y-3">
-          {!isRecording && !hasRecording && !analyzing && (<><button onClick={handleStartRecording} className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Mic className="w-5 h-5" />Start Recording</button><button onClick={() => navigate("/progress")} className="w-full h-12 bg-secondary hover:bg-muted text-foreground rounded-xl font-medium transition-all">Skip for Now</button></>)}
-          {isRecording && (<button onClick={stopRecording} className="w-full h-14 bg-warning text-warning-foreground rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Square className="w-5 h-5 fill-current" />Stop Recording</button>)}
-          {hasRecording && (<><button onClick={handleSave} className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Check className="w-5 h-5" />Save & Continue</button><button onClick={handleDeleteRecording} className="w-full h-12 bg-secondary hover:bg-muted text-foreground rounded-xl font-medium transition-all flex items-center justify-center gap-2"><Trash2 className="w-4 h-4" />Delete & Re-record</button></>)}
+          {!isRecording && !hasRecording && !analyzing && (<><button onClick={handleStartRecording} className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Mic className="w-5 h-5" />{t("doc.startRecording", "Start Recording")}</button><button onClick={() => navigate("/progress")} className="w-full h-12 bg-secondary hover:bg-muted text-foreground rounded-xl font-medium transition-all">{t("res.skip")}</button></>)}
+          {isRecording && (<button onClick={stopRecording} className="w-full h-14 bg-warning text-warning-foreground rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Square className="w-5 h-5 fill-current" />{t("doc.stopRecording", "Stop Recording")}</button>)}
+          {hasRecording && (<><button onClick={handleSave} className="w-full h-14 gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"><Check className="w-5 h-5" />{t("doc.saveContinue", "Save & Continue")}</button><button onClick={handleDeleteRecording} className="w-full h-12 bg-secondary hover:bg-muted text-foreground rounded-xl font-medium transition-all flex items-center justify-center gap-2"><Trash2 className="w-4 h-4" />{t("doc.deleteRerecord", "Delete & Re-record")}</button></>)}
         </div>
       </div>
     </div>

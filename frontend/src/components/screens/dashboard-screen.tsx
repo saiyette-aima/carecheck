@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 
 export function DashboardScreen() {
-  const { streak, checkHistory, resetExam } = useApp()
+  const { streak, checkHistory, resetExam, t, language } = useApp()
   const navigate = useNavigate()
 
   const startSelfCheck = () => {
@@ -34,9 +34,9 @@ export function DashboardScreen() {
     <div className="min-h-screen p-6 lg:p-10">
       {/* ── Header ── */}
       <div className="mb-8 animate-fade-in-up">
-        <p className="text-sm text-muted-foreground mb-1">Welcome back 👋</p>
+        <p className="text-sm text-muted-foreground mb-1">{t("dash.welcome")}</p>
         <h1 className="text-3xl lg:text-4xl font-extrabold text-foreground tracking-tight">
-          Your Dashboard
+          {t("dash.title")}
         </h1>
       </div>
 
@@ -53,10 +53,10 @@ export function DashboardScreen() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white mb-1">
-                Start Self-Check
+                {t("dash.startCheck")}
               </h2>
               <p className="text-white/70 text-sm">
-                Guided step-by-step breast examination — takes about 5 minutes
+                {t("dash.checkDesc")}
               </p>
             </div>
           </div>
@@ -76,12 +76,12 @@ export function DashboardScreen() {
               <Flame className="w-5 h-5 text-accent" />
             </div>
             <span className="text-sm font-medium text-muted-foreground">
-              Streak
+              {t("dash.streak")}
             </span>
           </div>
           <p className="text-3xl font-bold text-foreground">{streak}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            months consistent
+            {t("dash.streakSub")}
           </p>
         </div>
 
@@ -92,12 +92,12 @@ export function DashboardScreen() {
               <Calendar className="w-5 h-5 text-primary" />
             </div>
             <span className="text-sm font-medium text-muted-foreground">
-              Total Checks
+              {t("dash.totalChecks")}
             </span>
           </div>
           <p className="text-3xl font-bold text-foreground">{totalChecks}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            self-exams logged
+            {t("dash.totalSub")}
           </p>
         </div>
 
@@ -108,12 +108,12 @@ export function DashboardScreen() {
               <TrendingUp className="w-5 h-5 text-success" />
             </div>
             <span className="text-sm font-medium text-muted-foreground">
-              Clear Rate
+              {t("dash.clearRate")}
             </span>
           </div>
           <p className="text-3xl font-bold text-foreground">{clearRate}%</p>
           <p className="text-xs text-muted-foreground mt-1">
-            no concerns found
+            {t("dash.clearRateSub")}
           </p>
         </div>
 
@@ -132,23 +132,23 @@ export function DashboardScreen() {
               )}
             </div>
             <span className="text-sm font-medium text-muted-foreground">
-              Last Check
+              {t("dash.lastCheck")}
             </span>
           </div>
           <p className="text-lg font-bold text-foreground">
             {lastCheck 
-              ? new Date(lastCheck.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-              : "None yet"
+              ? new Date(lastCheck.date).toLocaleDateString(language === "hi" ? "hi-IN" : language === "ar" ? "ar-EG" : "en-US", { month: "short", day: "numeric", year: "numeric" })
+              : t("dash.noneYet")
             }
           </p>
           <p className={`text-xs mt-1 ${
             !lastCheck ? "text-muted-foreground" : lastCheck.hasConcern ? "text-warning font-medium" : "text-success font-medium"
           }`}>
             {!lastCheck 
-              ? "No self-exams logged" 
+              ? t("dash.noChecks") 
               : lastCheck.hasConcern 
-              ? "concern found ⚠️" 
-              : "all clear ✓"
+              ? t("dash.concernFound") 
+              : t("dash.allClear")
             }
           </p>
         </div>
@@ -165,10 +165,10 @@ export function DashboardScreen() {
           </div>
           <div className="flex-1">
             <p className="text-base font-semibold text-foreground">
-              View Progress
+              {t("dash.viewProgress")}
             </p>
             <p className="text-sm text-muted-foreground">
-              See your check history & trends
+              {t("dash.progressDesc")}
             </p>
           </div>
           <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
@@ -183,10 +183,10 @@ export function DashboardScreen() {
           </div>
           <div className="flex-1">
             <p className="text-base font-semibold text-foreground">
-              Set Reminder
+              {t("dash.setReminder")}
             </p>
             <p className="text-sm text-muted-foreground">
-              Never miss your monthly check
+              {t("dash.reminderDesc")}
             </p>
           </div>
           <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-warning group-hover:translate-x-1 transition-all" />
@@ -197,10 +197,10 @@ export function DashboardScreen() {
       <div className="glass-card rounded-xl p-6 card-elevated animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-foreground">
-            Monthly Streak
+            {t("dash.monthlyStreak")}
           </h3>
           <span className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
-            {streak} month{streak !== 1 ? "s" : ""}
+            {streak} {streak !== 1 ? t("dash.months") : t("dash.month")}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -218,7 +218,7 @@ export function DashboardScreen() {
           ))}
         </div>
         <p className="text-xs text-muted-foreground mt-3 text-center">
-          ✨ You're taking great care of yourself — keep it up!
+          {t("dash.streakGoal")}
         </p>
       </div>
     </div>

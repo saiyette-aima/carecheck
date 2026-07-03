@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { API_BASE_URL } from "@/config"
+import { translations } from "@/lib/translations"
 
 export interface CheckRecord {
   id?: string
@@ -46,6 +47,7 @@ interface AppContextType {
   resetExam: () => void
   userSettings: { email: string; reminder: string | null } | null
   saveReminder: (day: number, time: string, voice: boolean) => Promise<boolean>
+  t: (key: string, variables?: Record<string, string | number>) => string
 }
 
 const AppContext = createContext<AppContextType | null>(null)
@@ -58,8 +60,30 @@ export function useApp() {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [userId, setUserIdState] = useState<string | null>(null)
-  const [language, setLanguage] = useState("en")
+  const [language, setLanguageState] = useState(() => (typeof window !== "undefined" ? localStorage.getItem("language") || "en" : "en"))
   const [examStep, setExamStep] = useState(1)
+
+  const setLanguage = (lang: string) => {
+    setLanguageState(lang)
+    localStorage.setItem("language", lang)
+  }
+
+  useEffect(() => {
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr"
+    document.documentElement.lang = language
+  }, [language])
+
+  const t = (key: string, variables?: Record<string, string | number>): string => {
+    const langTranslations = translations[language] || translations["en"];
+    let text = langTranslations[key] || translations["en"][key] || key;
+    if (variables) {
+      Object.entries(variables).forEach(([k, v]) => {
+        text = text.replace(`{${k}}`, String(v));
+      });
+    }
+    return text;
+  };
+
   const [currentResponses, setCurrentResponses] = useState({
     lump: null as boolean | null,
     painOrDischarge: null as boolean | null,
@@ -225,7 +249,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       streak,
       resetExam,
       userSettings,
-      saveReminder
+      saveReminder,
+      t
     }}>
       {children}
     </AppContext.Provider>
