@@ -150,11 +150,11 @@ export function LoginScreen() {
               </button>
             </form>
 
-            <div className="relative flex items-center py-4">
+            {/* <div className="relative flex items-center py-4">
               <div className="flex-grow border-t border-border"></div>
               <span className="flex-shrink-0 mx-4 text-xs text-muted-foreground">{t("login.or")}</span>
               <div className="flex-grow border-t border-border"></div>
-            </div>
+            </div> */}
 
             {/* <button
               onClick={() => navigate("/language")}
@@ -167,9 +167,9 @@ export function LoginScreen() {
           </div>
 
           {/* Privacy note */}
-          <p className="text-xs text-muted-foreground text-center leading-relaxed">
+          {/* <p className="text-xs text-muted-foreground text-center leading-relaxed">
             {t("login.privacy")}
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

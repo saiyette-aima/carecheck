@@ -147,7 +147,7 @@ export function ReminderScreen() {
         </div>
 
         {/* Voice reminder toggle */}
-        <div className="mb-10 animate-fade-in-up" style={{animationDelay:"0.15s"}}>
+        {/* <div className="mb-10 animate-fade-in-up" style={{animationDelay:"0.15s"}}>
           <button onClick={() => setVoiceReminder(!voiceReminder)}
             className="w-full p-4 rounded-xl bg-card border border-border flex items-center gap-4 hover:shadow-sm transition-all">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${voiceReminder ? "bg-primary/15" : "bg-secondary"}`}>
@@ -161,7 +161,7 @@ export function ReminderScreen() {
               <div className={`w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${voiceReminder ? "translate-x-6" : "translate-x-0"}`} />
             </div>
           </button>
-        </div>
+        </div> */}
 
         {/* Save */}
         <button onClick={handleSave} disabled={loading}

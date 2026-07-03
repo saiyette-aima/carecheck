@@ -3,6 +3,7 @@ import { AppProvider } from "./components/app-context"
 import { Layout } from "./components/layout"
 
 // Import all screens
+import { LandingScreen } from "./components/screens/landing-screen"
 import { LoginScreen } from "./components/screens/login-screen"
 import { LanguageScreen } from "./components/screens/language-screen"
 import { DashboardScreen } from "./components/screens/dashboard-screen"
@@ -23,7 +24,8 @@ function App() {
       <AppProvider>
         <Routes>
           {/* Public routes — no nav shell */}
-          <Route path="/" element={<LoginScreen />} />
+          <Route path="/" element={<LandingScreen />} />
+          <Route path="/login" element={<LoginScreen />} />
           <Route path="/language" element={<LanguageScreen />} />
 
           {/* Authenticated routes — with persistent nav layout */}
