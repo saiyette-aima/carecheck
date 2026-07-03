@@ -2,7 +2,7 @@
 
 import { useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "@/config"
-import { MapPin, Phone, ExternalLink, ArrowLeft, Clock, Users, Star, Loader2 } from "lucide-react"
+import { MapPin, ExternalLink, ArrowLeft, Clock, Users, Star, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useApp } from "../app-context"
 import { Translate } from "@/components/translate"
@@ -218,16 +218,9 @@ export function FindClinicScreen() {
 
                   {/* Action buttons */}
                   <div className="flex gap-2">
-                    <a
-                      href={`tel:${clinic.phone.replace(/\D/g, "")}`}
-                      className="flex-1 py-3 gradient-primary text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20"
-                    >
-                      <Phone className="w-4 h-4" />
-                      {t("clinic.call")}
-                    </a>
                     <button
                       onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.name + " " + clinic.address)}`, "_blank")}
-                      className="flex-1 py-3 bg-secondary hover:bg-muted text-foreground rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-md"
+                      className="w-full py-3 gradient-primary text-white rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20"
                     >
                       <ExternalLink className="w-4 h-4" />
                       {t("clinic.directions")}

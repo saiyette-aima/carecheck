@@ -154,6 +154,20 @@ export function Layout({ children }: LayoutProps) {
                 </button>
               )
             })}
+            <div className="border-t border-border mt-2 pt-2">
+              <button
+                onClick={() => {
+                  setUserId(null)
+                  setLanguage("en")
+                  setMobileOpen(false)
+                  navigate("/")
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <LogOut className="w-[18px] h-[18px]" />
+                {t("nav.signOut")}
+              </button>
+            </div>
           </div>
         )}
       </div>
