@@ -19,6 +19,7 @@ import { AssemblyAI } from 'assemblyai';
 import { Groq } from 'groq-sdk';
 import nodemailer from "nodemailer"
 import cron from 'node-cron'
+import jwt from "jsonwebtoken"
 import { withAccelerate } from "@prisma/extension-accelerate"
 
 // Initialize clients from environment variables
@@ -41,7 +42,13 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASS,
   },
-});  
+});
+
+// Secret used to sign password-reset tokens. Combined per-user with the current
+// password hash so a token becomes invalid the moment the password changes (single-use).
+const JWT_SECRET = process.env.JWT_SECRET || "carecheck-dev-secret-change-me";
+// Base URL of the frontend, used to build links inside emails.
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const app = express();
 app.use(cors());
@@ -82,7 +89,103 @@ app.post('/signin', async (req: Request, res: Response) => {
         console.error(error)
         return res.status(500).json({ "message": "Internal server error" })
     }
-}) 
+})
+
+// HTML template for the password-reset email
+function resetEmailHtml(email: string, link: string): string {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"><title>Reset your CareCheck password</title></head>
+    <body style="margin:0; padding:0; background-color:#fdf4f6; font-family:Arial, sans-serif; color:#333333;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px; background-color:#fdf4f6;">
+    <tr><td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; background-color:#ffffff; border-radius:14px; overflow:hidden;">
+        <tr><td style="background-color:#f6c7d2; padding:28px; text-align:center;">
+            <h1 style="margin:0; font-size:26px; color:#5a2430;">Reset your password</h1>
+        </td></tr>
+        <tr><td style="padding:30px;">
+            <p style="font-size:17px; line-height:1.6; margin-top:0;">Hi ${email.split("@")[0]},</p>
+            <p style="font-size:17px; line-height:1.6;">We received a request to reset the password for your CareCheck account. Click the button below to choose a new password.</p>
+            <div style="text-align:center; margin:32px 0;">
+                <a href="${link}" style="background-color:#a23063; color:#ffffff; text-decoration:none; padding:15px 28px; border-radius:8px; font-size:17px; font-weight:bold; display:inline-block;">Reset Password</a>
+            </div>
+            <p style="font-size:14px; line-height:1.6; color:#666666;">This link will expire in 30 minutes and can only be used once. If you did not request a password reset, you can safely ignore this email — your password will stay the same.</p>
+            <p style="font-size:13px; line-height:1.6; color:#999999; word-break:break-all;">If the button doesn't work, paste this link into your browser:<br/>${link}</p>
+        </td></tr>
+        <tr><td style="background-color:#fde8ee; padding:18px; text-align:center; font-size:13px; color:#777777;">CareCheck — Your health companion</td></tr>
+        </table>
+    </td></tr>
+    </table>
+    </body>
+    </html>`;
+}
+
+// Request a password reset — emails a single-use, time-limited link.
+app.post('/forgot-password', async (req: Request, res: Response): Promise<any> => {
+    const { email } = req.body
+    if (!email) return res.status(400).json({ message: "Email is required" })
+    try {
+        const user = await prisma.user.findUnique({ where: { email } })
+        // Only send a mail if the account exists, but always respond identically so
+        // we never reveal which emails are registered.
+        if (user) {
+            const token = jwt.sign(
+                { id: user.id, email: user.email },
+                JWT_SECRET + user.password,
+                { expiresIn: "30m" }
+            )
+            const link = `${FRONTEND_URL}/reset-password?token=${encodeURIComponent(token)}`
+            try {
+                await transporter.sendMail({
+                    from: '"CareCheck" <no-reply@carecheck>',
+                    to: [user.email],
+                    subject: "Reset your CareCheck password",
+                    html: resetEmailHtml(user.email, link),
+                })
+                console.log(`[ForgotPassword] Reset email sent to ${user.email}`)
+            } catch (mailErr) {
+                console.error("[ForgotPassword] Failed to send email:", mailErr)
+                return res.status(500).json({ message: "Failed to send reset email. Please try again later." })
+            }
+        }
+        return res.status(200).json({ message: "If an account exists for that email, a password reset link has been sent." })
+    } catch (error) {
+        console.error("[ForgotPassword]", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+})
+
+// Complete a password reset using the token from the email link.
+app.post('/reset-password', async (req: Request, res: Response): Promise<any> => {
+    const { token, password } = req.body
+    if (!token || !password) return res.status(400).json({ message: "Token and new password are required" })
+    if (String(password).length < 6) return res.status(400).json({ message: "Password must be at least 6 characters long" })
+    try {
+        // Read the id from the (unverified) token so we can look up the user's
+        // current password hash, which forms the per-user signing key.
+        const decoded = jwt.decode(token) as { id?: string } | null
+        if (!decoded?.id) return res.status(400).json({ message: "Invalid or expired reset link" })
+
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } })
+        if (!user) return res.status(400).json({ message: "Invalid or expired reset link" })
+
+        try {
+            jwt.verify(token, JWT_SECRET + user.password)
+        } catch {
+            // Signature won't match once the password has changed → single-use links.
+            return res.status(400).json({ message: "This reset link is invalid or has already been used." })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+        await prisma.user.update({ where: { id: user.id }, data: { password: hashedPassword } })
+        console.log(`[ResetPassword] Password updated for ${user.email}`)
+        return res.status(200).json({ message: "Password updated successfully. You can now sign in." })
+    } catch (error) {
+        console.error("[ResetPassword]", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+})
 
 //transribe via assembly ai STT
 app.post('/transcribe', upload.single("voice"), async (req: Request, res: Response): Promise<any> => {
@@ -330,7 +433,7 @@ cron.schedule("0 * * * *", async () => {
                                     <li>Anything that feels different from before</li>
                                 </ul>
                                 <div style="text-align:center; margin:32px 0;">
-                                    <a href="http://localhost:5173/dashboard"
+                                    <a href="${FRONTEND_URL}/dashboard"
                                     style="background-color:#d85b82; color:#ffffff; text-decoration:none; padding:15px 28px; border-radius:8px; font-size:17px; font-weight:bold; display:inline-block;">
                                     Start New Exam
                                     </a>

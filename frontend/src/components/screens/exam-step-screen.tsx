@@ -2,8 +2,15 @@
 
 import { useApp } from "@/components/app-context"
 import { useNavigate } from "react-router-dom"
-import { Volume2, RotateCcw, ChevronRight, X, Pause } from "lucide-react"
 import { useState, useEffect } from "react"
+
+function MSym({ name, className = "", fill = false, style }: { name: string; className?: string; fill?: boolean; style?: React.CSSProperties }) {
+  return (
+    <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: fill ? "'FILL' 1" : "'FILL' 0", ...style }}>
+      {name}
+    </span>
+  )
+}
 
 const examSteps = [
   {
@@ -33,174 +40,163 @@ const examSteps = [
 ]
 
 function StepIllustration({ type }: { type: string }) {
+  // Shared elegant line-art woman (hair, head, neck, waisted gown) — drawn per pose
+  const strokeProps = {
+    fill: "none" as const,
+    stroke: "currentColor",
+    strokeWidth: 3.4,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  }
+
   const illustrations: Record<string, JSX.Element> = {
-    /* ── Step 1: Mirror — gentle breathing sway with reflection shimmer ── */
+    /* ── Step 1: Mirror — she stands facing the mirror, breathing gently ── */
     "mirror": (
-      <svg viewBox="0 0 120 140" className="w-full h-full">
-        {/* Mirror frame */}
-        <rect x="20" y="10" width="80" height="100" rx="10" fill="currentColor" opacity="0.1" />
-        <rect x="25" y="15" width="70" height="90" rx="8" fill="currentColor" opacity="0.05" />
-        {/* Mirror shimmer */}
-        <rect x="25" y="15" width="70" height="90" rx="8" fill="currentColor" opacity="0">
-          <animate attributeName="opacity" values="0;0.08;0" dur="3s" repeatCount="indefinite" />
-        </rect>
-        {/* Stand */}
-        <rect x="55" y="110" width="10" height="20" fill="currentColor" opacity="0.2" />
-        <ellipse cx="60" cy="132" rx="25" ry="5" fill="currentColor" opacity="0.15" />
+      <svg viewBox="0 0 200 240" className="w-full h-full" {...strokeProps}>
+        {/* Standing mirror */}
+        <rect x="48" y="16" width="104" height="196" rx="52" strokeWidth={3} opacity="0.2" />
+        <rect x="48" y="16" width="104" height="196" rx="52" fill="currentColor" stroke="none" opacity="0.03" />
+        <path d="M100 212 L100 224 M82 224 L118 224" strokeWidth={3} opacity="0.2" />
 
-        {/* Person group — breathing animation */}
+        {/* Woman — gentle breathing rise */}
         <g>
-          <animateTransform attributeName="transform" type="translate" values="0,0;0,-2;0,0" dur="3s" repeatCount="indefinite" />
+          <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
+          {/* Hair */}
+          <path d="M77 66 C72 34 128 34 123 66 C118 50 110 44 100 44 C90 44 82 50 77 66 Z" fill="currentColor" stroke="none" opacity="0.55" />
           {/* Head */}
-          <circle cx="60" cy="50" r="12" fill="currentColor" opacity="0.7" />
-          {/* Body — subtle breathing scale */}
-          <ellipse cx="60" cy="85" rx="18" ry="22" fill="currentColor" opacity="0.45">
-            <animate attributeName="rx" values="18;19;18" dur="3s" repeatCount="indefinite" />
-            <animate attributeName="ry" values="22;22.5;22" dur="3s" repeatCount="indefinite" />
-          </ellipse>
-          {/* Left arm — gentle sway */}
-          <line x1="42" y1="70" x2="38" y2="95" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.45">
-            <animate attributeName="x2" values="38;36;38" dur="3s" repeatCount="indefinite" />
-          </line>
-          {/* Right arm — gentle sway */}
-          <line x1="78" y1="70" x2="82" y2="95" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.45">
-            <animate attributeName="x2" values="82;84;82" dur="3s" repeatCount="indefinite" />
-          </line>
+          <circle cx="100" cy="60" r="18" fill="currentColor" fillOpacity="0.07" />
+          {/* Neck */}
+          <path d="M92 76 L92 86 M108 76 L108 86" />
+          {/* Gown / torso — soft fill + outline */}
+          <path d="M100 86 C88 88 82 96 80 110 C78 124 74 142 69 170 C82 178 118 178 131 170 C126 142 122 124 120 110 C118 96 112 88 100 86 Z" fill="currentColor" stroke="none" fillOpacity="0.06" />
+          <path d="M100 86 C88 88 82 96 80 110 C78 124 74 142 69 170 C82 178 118 178 131 170 C126 142 122 124 120 110 C118 96 112 88 100 86 Z">
+            <animate attributeName="opacity" values="1;0.85;1" dur="4.5s" repeatCount="indefinite" />
+          </path>
+          {/* Arms resting at sides */}
+          <path d="M83 98 C76 112 74 132 77 154" />
+          <path d="M117 98 C124 112 126 132 123 154" />
         </g>
-        {/* Scanning eye-line indicators */}
-        <line x1="35" y1="78" x2="28" y2="78" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0">
-          <animate attributeName="opacity" values="0;0.4;0" dur="2.5s" repeatCount="indefinite" begin="0.5s" />
-        </line>
-        <line x1="85" y1="78" x2="92" y2="78" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0">
-          <animate attributeName="opacity" values="0;0.4;0" dur="2.5s" repeatCount="indefinite" begin="0.5s" />
-        </line>
       </svg>
     ),
 
-    /* ── Step 2: Arms Up — arms rising and lowering continuously ── */
+    /* ── Step 2: Arms Up — arms rise overhead and lower again ── */
     "arms-up": (
-      <svg viewBox="0 0 120 140" className="w-full h-full">
+      <svg viewBox="0 0 200 240" className="w-full h-full" {...strokeProps}>
+        {/* Hair */}
+        <path d="M77 66 C72 34 128 34 123 66 C118 50 110 44 100 44 C90 44 82 50 77 66 Z" fill="currentColor" stroke="none" opacity="0.55" />
         {/* Head */}
-        <circle cx="60" cy="45" r="15" fill="currentColor" opacity="0.7" />
-        {/* Body */}
-        <ellipse cx="60" cy="92" rx="20" ry="28" fill="currentColor" opacity="0.45" />
+        <circle cx="100" cy="60" r="18" fill="currentColor" fillOpacity="0.07" />
+        {/* Neck */}
+        <path d="M92 76 L92 86 M108 76 L108 86" />
+        {/* Gown */}
+        <path d="M100 86 C88 88 82 96 80 110 C78 124 74 142 69 170 C82 178 118 178 131 170 C126 142 122 124 120 110 C118 96 112 88 100 86 Z" fill="currentColor" stroke="none" fillOpacity="0.06" />
 
-        {/* Left arm — animating from down to up */}
-        <line x1="40" y1="72" x2="36" y2="95" stroke="currentColor" strokeWidth="5" strokeLinecap="round" opacity="0.5">
-          <animate attributeName="x2" values="36;25;36" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="y2" values="95;35;95" dur="3s" repeatCount="indefinite" />
-        </line>
-        {/* Left hand */}
-        <circle cx="36" cy="95" r="5" fill="currentColor" opacity="0.35">
-          <animate attributeName="cx" values="36;22;36" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="cy" values="95;32;95" dur="3s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Right arm — animating from down to up */}
-        <line x1="80" y1="72" x2="84" y2="95" stroke="currentColor" strokeWidth="5" strokeLinecap="round" opacity="0.5">
-          <animate attributeName="x2" values="84;95;84" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="y2" values="95;35;95" dur="3s" repeatCount="indefinite" />
-        </line>
-        {/* Right hand */}
-        <circle cx="84" cy="95" r="5" fill="currentColor" opacity="0.35">
-          <animate attributeName="cx" values="84;98;84" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="cy" values="95;32;95" dur="3s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Look-for-change indicator arrows — appear when arms are up */}
-        <g opacity="0">
-          <animate attributeName="opacity" values="0;0;0.5;0.5;0;0" dur="3s" repeatCount="indefinite" />
-          <path d="M30 70 L38 74" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M30 70 L32 77" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M90 70 L82 74" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M90 70 L88 77" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </g>
-      </svg>
-    ),
-
-    /* ── Step 3: Examine — hand orbiting in circular motions with scan rings ── */
-    "examine": (
-      <svg viewBox="0 0 120 140" className="w-full h-full">
-        {/* Head */}
-        <circle cx="60" cy="32" r="14" fill="currentColor" opacity="0.7" />
-        {/* Body */}
-        <ellipse cx="60" cy="82" rx="25" ry="35" fill="currentColor" opacity="0.4" />
-        {/* Left arm resting */}
-        <line x1="85" y1="60" x2="95" y2="85" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.35" />
-
-        {/* Examining hand — orbiting in a circle */}
-        <g>
-          <circle cx="0" cy="0" r="6" fill="currentColor" opacity="0.6">
-            <animateMotion path="M50,72 a10,10 0 1,1 0,0.01" dur="2s" repeatCount="indefinite" />
-          </circle>
-          {/* Finger dots */}
-          <circle cx="0" cy="0" r="2" fill="currentColor" opacity="0.4">
-            <animateMotion path="M47,70 a10,10 0 1,1 0,0.01" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="0" cy="0" r="2" fill="currentColor" opacity="0.4">
-            <animateMotion path="M53,70 a10,10 0 1,1 0,0.01" dur="2s" repeatCount="indefinite" />
-          </circle>
-        </g>
-
-        {/* Scan ring 1 — expanding outward */}
-        <circle cx="50" cy="75" r="5" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">
-          <animate attributeName="r" values="5;18;28" dur="2.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.35;0.15;0" dur="2.5s" repeatCount="indefinite" />
-        </circle>
-        {/* Scan ring 2 — staggered */}
-        <circle cx="50" cy="75" r="5" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">
-          <animate attributeName="r" values="5;18;28" dur="2.5s" repeatCount="indefinite" begin="1.2s" />
-          <animate attributeName="opacity" values="0.3;0.12;0" dur="2.5s" repeatCount="indefinite" begin="1.2s" />
-        </circle>
-
-        {/* Circular motion guide — dashed rotating circle */}
-        <circle cx="50" cy="75" r="12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 4" opacity="0.25">
-          <animateTransform attributeName="transform" type="rotate" from="0 50 75" to="360 50 75" dur="4s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-    ),
-
-    /* ── Step 4: Lying — hand doing circular exam with pulsing highlight ── */
-    "lying": (
-      <svg viewBox="0 0 140 100" className="w-full h-full">
-        {/* Bed surface */}
-        <line x1="5" y1="78" x2="135" y2="78" stroke="currentColor" strokeWidth="2" opacity="0.15" />
-        {/* Pillow */}
-        <ellipse cx="28" cy="55" rx="22" ry="10" fill="currentColor" opacity="0.12">
-          <animate attributeName="ry" values="10;11;10" dur="4s" repeatCount="indefinite" />
-        </ellipse>
-
-        {/* Head on pillow */}
-        <circle cx="32" cy="48" r="12" fill="currentColor" opacity="0.7" />
-
-        {/* Body lying */}
-        <ellipse cx="80" cy="56" rx="40" ry="14" fill="currentColor" opacity="0.4">
-          <animate attributeName="ry" values="14;14.5;14" dur="4s" repeatCount="indefinite" />
-        </ellipse>
-
-        {/* Arm behind head */}
-        <path d="M22 58 Q10 48 26 38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.45">
-          <animate attributeName="d" values="M22 58 Q10 48 26 38;M22 58 Q8 46 26 36;M22 58 Q10 48 26 38" dur="4s" repeatCount="indefinite" />
+        {/* Left arm raising */}
+        <path d="M83 98 C76 112 74 132 77 154">
+          <animate attributeName="d" values="M83 98 C76 112 74 132 77 154; M83 98 C74 74 66 50 60 34; M83 98 C76 112 74 132 77 154" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
         </path>
-
-        {/* Examining hand — orbiting */}
-        <circle cx="0" cy="0" r="5" fill="currentColor" opacity="0.55">
-          <animateMotion path="M75,48 a8,8 0 1,1 0,0.01" dur="2.2s" repeatCount="indefinite" />
+        <circle cx="77" cy="154" r="6" fill="currentColor" stroke="none">
+          <animate attributeName="cx" values="77;60;77" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
+          <animate attributeName="cy" values="154;34;154" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
         </circle>
 
-        {/* Scan pulse on breast area */}
-        <circle cx="75" cy="50" r="4" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">
-          <animate attributeName="r" values="4;14;22" dur="2.2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.35;0.15;0" dur="2.2s" repeatCount="indefinite" />
+        {/* Right arm raising */}
+        <path d="M117 98 C124 112 126 132 123 154">
+          <animate attributeName="d" values="M117 98 C124 112 126 132 123 154; M117 98 C126 74 134 50 140 34; M117 98 C124 112 126 132 123 154" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
+        </path>
+        <circle cx="123" cy="154" r="6" fill="currentColor" stroke="none">
+          <animate attributeName="cx" values="123;140;123" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
+          <animate attributeName="cy" values="154;34;154" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.37 0 0.28 1; 0.37 0 0.28 1" keyTimes="0;0.5;1" />
         </circle>
-        <circle cx="75" cy="50" r="4" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">
-          <animate attributeName="r" values="4;14;22" dur="2.2s" repeatCount="indefinite" begin="1.1s" />
-          <animate attributeName="opacity" values="0.3;0.1;0" dur="2.2s" repeatCount="indefinite" begin="1.1s" />
-        </circle>
+      </svg>
+    ),
 
+    /* ── Step 3: Examine — one hand traces slow circles over the chest ── */
+    "examine": (
+      <svg viewBox="0 0 200 240" className="w-full h-full" {...strokeProps}>
+        {/* Hair */}
+        <path d="M77 60 C72 28 128 28 123 60 C118 44 110 38 100 38 C90 38 82 44 77 60 Z" fill="currentColor" stroke="none" opacity="0.55" />
+        {/* Head */}
+        <circle cx="100" cy="54" r="18" fill="currentColor" fillOpacity="0.07" />
+        {/* Neck */}
+        <path d="M92 70 L92 80 M108 70 L108 80" />
+        {/* Gown */}
+        <path d="M100 80 C88 82 82 90 80 104 C78 118 74 140 69 172 C82 180 118 180 131 172 C126 140 122 118 120 104 C118 90 112 82 100 80 Z" fill="currentColor" stroke="none" fillOpacity="0.06" />
+        {/* Left arm resting */}
+        <path d="M83 92 C76 108 74 130 77 156" />
+        {/* Right arm bent across to the chest */}
+        <path d="M117 92 C122 104 116 114 104 118" />
+
+        {/* Examining hand tracing a circle over the chest */}
+        <g stroke="none" fill="currentColor">
+          <circle r="6.5">
+            <animateMotion path="M100,104 a11,11 0 1,1 0,0.01" dur="2.6s" repeatCount="indefinite" />
+          </circle>
+          <circle r="2.4" opacity="0.5">
+            <animateMotion path="M96,101 a11,11 0 1,1 0,0.01" dur="2.6s" repeatCount="indefinite" />
+          </circle>
+          <circle r="2.4" opacity="0.5">
+            <animateMotion path="M104,101 a11,11 0 1,1 0,0.01" dur="2.6s" repeatCount="indefinite" />
+          </circle>
+        </g>
+
+        {/* Soft scan rings */}
+        <circle cx="100" cy="115" r="6" strokeWidth={1.4} opacity="0">
+          <animate attributeName="r" values="6;20;32" dur="2.8s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.3;0.12;0" dur="2.8s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="100" cy="115" r="6" strokeWidth={1.4} opacity="0">
+          <animate attributeName="r" values="6;20;32" dur="2.8s" repeatCount="indefinite" begin="1.4s" />
+          <animate attributeName="opacity" values="0.26;0.1;0" dur="2.8s" repeatCount="indefinite" begin="1.4s" />
+        </circle>
         {/* Dashed circular guide */}
-        <circle cx="75" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.2">
-          <animateTransform attributeName="transform" type="rotate" from="0 75 50" to="360 75 50" dur="5s" repeatCount="indefinite" />
+        <circle cx="100" cy="115" r="15" strokeWidth={1.5} strokeDasharray="3 5" opacity="0.28">
+          <animateTransform attributeName="transform" type="rotate" from="0 100 115" to="360 100 115" dur="5s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    ),
+
+    /* ── Step 4: Lying — reclined, one arm behind head, the other examines ── */
+    "lying": (
+      <svg viewBox="0 0 240 150" className="w-full h-full" {...strokeProps}>
+        {/* Bed line */}
+        <path d="M6 118 L234 118" strokeWidth={3} opacity="0.15" />
+        {/* Pillow */}
+        <rect x="14" y="60" width="66" height="40" rx="18" fill="currentColor" stroke="none" fillOpacity="0.07" />
+        <rect x="14" y="60" width="66" height="40" rx="18" strokeWidth={3} opacity="0.25">
+          <animate attributeName="y" values="60;61;60" dur="4.5s" repeatCount="indefinite" />
+        </rect>
+
+        {/* Reclined woman — gentle breathing */}
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0 0; 0 -1.5; 0 0" dur="4.5s" repeatCount="indefinite" />
+          {/* Hair */}
+          <path d="M40 64 C24 60 24 40 44 40 C58 40 60 52 58 60 Z" fill="currentColor" stroke="none" opacity="0.55" />
+          {/* Head on pillow */}
+          <circle cx="52" cy="62" r="16" fill="currentColor" fillOpacity="0.07" />
+          {/* Arm tucked behind the head */}
+          <path d="M40 66 C24 60 20 44 34 36" />
+          {/* Reclined torso → hip → bent knees */}
+          <path d="M66 66 C96 58 138 62 168 74 C176 77 176 90 168 92 C138 98 96 96 70 88" fill="currentColor" stroke="none" fillOpacity="0.06" />
+          <path d="M66 66 C96 58 138 62 168 74" />
+          <path d="M70 88 C96 96 138 98 168 92" />
+          {/* Legs — thigh up, shin down to the bed */}
+          <path d="M168 82 C192 80 206 66 208 54 C210 68 208 84 198 98 C192 106 188 112 190 118" />
+        </g>
+
+        {/* Examining hand tracing a circle over the chest */}
+        <g stroke="none" fill="currentColor">
+          <circle r="6">
+            <animateMotion path="M110,74 a10,10 0 1,1 0,0.01" dur="2.6s" repeatCount="indefinite" />
+          </circle>
+        </g>
+        {/* Scan pulse */}
+        <circle cx="110" cy="80" r="5" strokeWidth={1.4} opacity="0">
+          <animate attributeName="r" values="5;16;26" dur="2.6s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.3;0.12;0" dur="2.6s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="110" cy="80" r="15" strokeWidth={1.5} strokeDasharray="3 5" opacity="0.25">
+          <animateTransform attributeName="transform" type="rotate" from="0 110 80" to="360 110 80" dur="5.5s" repeatCount="indefinite" />
         </circle>
       </svg>
     ),
@@ -221,6 +217,21 @@ export function ExamStepScreen() {
 
   const currentStep = examSteps[examStep - 1]
   const isLastStep = examStep === examSteps.length
+
+  // Static waveform bars with a central peak
+  const barCount = 40
+  const [waveBars] = useState(() =>
+    Array.from({ length: barCount }, (_, i) => {
+      const distFromCenter = Math.abs(i - barCount / 2) / (barCount / 2)
+      const scale = 1 - distFromCenter * 0.7
+      return {
+        height: Math.round(8 + 32 * scale),
+        // uneven start + slightly different tempo per bar → a living, human voice-print
+        delay: Number((Math.random() * 2).toFixed(2)),
+        duration: Number((1.2 + Math.random() * 0.9).toFixed(2)),
+      }
+    })
+  )
 
   useEffect(() => {
     // Stop previous audio
@@ -289,119 +300,118 @@ export function ExamStepScreen() {
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-10">
+    <div className="min-h-screen relative">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-8 animate-fade-in">
-        <div className="flex items-center gap-4">
+      <header className="w-full px-safe-margin py-8 flex items-center justify-between animate-fade-in">
+        <div className="flex items-center gap-element-gap">
           <button
             onClick={() => navigate("/dashboard")}
-            className="w-10 h-10 rounded-xl bg-secondary hover:bg-muted flex items-center justify-center transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-all active:scale-95 group"
           >
-            <X className="w-5 h-5 text-foreground" />
+            <MSym name="close" className="text-on-surface-variant group-hover:text-primary" />
           </button>
           <div>
-            <p className="text-xs font-medium text-primary uppercase tracking-wider">{t("exam.title")}</p>
-            <h1 className="text-xl font-bold text-foreground">
+            <p className="font-label-sm text-[11px] text-primary/80 uppercase tracking-[0.2em] font-medium mb-0.5">{t("exam.title")}</p>
+            <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface font-normal">
               {t("exam.step")} {examStep} {t("exam.of")} {examSteps.length}
             </h1>
           </div>
         </div>
-      </div>
+        <div className="hidden md:flex gap-3">
+          {examSteps.map((_, i) => (
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all duration-500 ${
+                i === examStep - 1 ? "w-12 bg-primary/50" : i < examStep - 1 ? "w-6 bg-primary/30" : "w-3 bg-surface-container-highest/60"
+              }`}
+            />
+          ))}
+        </div>
+      </header>
 
-      {/* ── Step progress bar ── */}
-      <div className="flex gap-2 mb-10 animate-fade-in-up">
-        {examSteps.map((_, i) => (
-          <div
-            key={i}
-            className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${
-              i < examStep
-                ? "gradient-primary"
-                : i === examStep - 1
-                ? "gradient-primary"
-                : "bg-muted"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* ── Two-column content ── */}
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
+      <main className="max-w-7xl mx-auto px-safe-margin pt-element-gap pb-16 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
         {/* Illustration */}
-        <div className="flex-1 flex items-center justify-center animate-scale-in">
-          <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-primary/5 flex items-center justify-center animate-glow-pulse">
-            <div className="w-48 h-48 lg:w-60 lg:h-60 rounded-full bg-primary/8 flex items-center justify-center">
-              <div className="w-36 h-36 lg:w-44 lg:h-44">
-                <StepIllustration type={currentStep.illustration} />
-              </div>
+        <div className="lg:col-span-5 relative flex justify-center animate-scale-in">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-64 h-64 md:w-96 md:h-96 rounded-full bg-primary/5 animate-breathe opacity-40" />
+          </div>
+          <div className="relative z-10 w-full max-w-md aspect-square bg-surface-container-low organic-shape layered-shadow flex items-center justify-center p-12 overflow-hidden">
+            <div className="w-3/4 h-3/4">
+              <StepIllustration type={currentStep.illustration} />
             </div>
+          </div>
+          {/* Floating support badge */}
+          <div className="absolute -bottom-4 right-0 md:-right-2 z-20 bg-surface/95 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-outline-variant/20 flex items-center gap-3 animate-float">
+            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+              <MSym name="favorite" fill className="text-primary text-lg" />
+            </div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant normal-case tracking-normal">We're here to support you.</p>
           </div>
         </div>
 
-        {/* Instructions */}
-        <div className="flex-1 space-y-6 w-full max-w-lg animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          {/* Audio player card */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-start gap-4 mb-4">
+        {/* Content */}
+        <div className="lg:col-span-7 flex flex-col gap-element-gap lg:pl-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <div className="glass-card p-8 md:p-12 rounded-[3rem] relative overflow-hidden">
+            <div className="flex flex-col md:flex-row items-start gap-8 mb-8">
               <button
                 onClick={togglePlay}
-                className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                  isPlaying ? "gradient-primary shadow-lg shadow-primary/25" : "bg-secondary hover:bg-muted"
-                }`}
+                className="w-16 h-16 flex-shrink-0 bg-primary/90 rounded-2xl flex items-center justify-center text-on-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform active:scale-95"
               >
-                {isPlaying ? (
-                  <Pause className="w-6 h-6 text-white" />
-                ) : (
-                  <Volume2 className="w-6 h-6 text-foreground" />
-                )}
+                <MSym name={isPlaying ? "pause" : "play_arrow"} fill className="text-3xl" />
               </button>
-
               <div>
-                <h2 className="text-xl font-bold text-foreground mb-1">
+                <h2 className="font-headline-lg text-headline-lg-mobile md:text-3xl text-on-surface mb-4 leading-tight">
                   {t(`exam.step${currentStep.id}Title`)}
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="font-body-lg text-body-lg text-on-surface-variant opacity-90">
                   {t(`exam.step${currentStep.id}Desc`)}
                 </p>
               </div>
             </div>
 
-            {/* Audio waveform */}
-            {isPlaying && (
-              <div className="flex items-center justify-center gap-1 h-10 animate-fade-in">
-                {[...Array(24)].map((_, i) => (
+            {/* Waveform */}
+            <div className="flex items-end justify-center py-6 waveform-glow">
+              <div className="pulse-wave">
+                {waveBars.map((bar, i) => (
                   <div
                     key={i}
-                    className="w-1 bg-primary rounded-full"
+                    className="wave-bar"
                     style={{
-                      animation: `wave-bar 0.8s ease-in-out infinite`,
-                      animationDelay: `${i * 0.04}s`,
+                      height: `${bar.height}px`,
+                      animationDelay: `${bar.delay}s`,
+                      animationDuration: `${bar.duration}s`,
+                      animationPlayState: isPlaying ? "running" : "paused",
                     }}
                   />
                 ))}
               </div>
-            )}
+            </div>
+
+            <div className="mt-8 flex items-center gap-3 text-on-secondary-fixed-variant/60">
+              <MSym name="lock" className="text-sm" />
+              <p className="font-label-sm text-[11px] uppercase tracking-wider">Privacy: This session is entirely local and private.</p>
+            </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3">
+          {/* Navigation actions */}
+          <div className="flex flex-col sm:flex-row items-center gap-5">
             <button
               onClick={handleRepeat}
-              className="flex-1 h-14 bg-secondary hover:bg-muted text-foreground rounded-xl flex items-center justify-center gap-2 text-base font-semibold transition-all duration-200 hover:shadow-md"
+              className="w-full sm:w-auto px-10 py-5 rounded-full font-title-md text-title-md border-2 border-outline-variant/40 text-on-surface-variant flex items-center justify-center gap-3 hover:bg-surface-container-high hover:border-outline-variant transition-all active:scale-95 group"
             >
-              <RotateCcw className="w-5 h-5" />
+              <MSym name="replay" className="group-hover:-rotate-45 transition-transform" />
               {t("exam.repeat")}
             </button>
-
             <button
               onClick={handleNext}
-              className="flex-[2] h-14 gradient-primary text-white rounded-xl flex items-center justify-center gap-2 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              className="w-full sm:flex-1 px-10 py-5 rounded-full font-title-md text-title-md bg-primary text-on-primary flex items-center justify-center gap-3 shadow-2xl shadow-primary/30 hover:bg-primary-container transition-all active:scale-95"
             >
               {isLastStep ? t("exam.done") : t("exam.next")}
-              <ChevronRight className="w-5 h-5" />
+              <MSym name="arrow_forward" />
             </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

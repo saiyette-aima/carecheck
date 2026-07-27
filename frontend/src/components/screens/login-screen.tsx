@@ -12,7 +12,38 @@ export function LoginScreen() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  
+
+  // Forgot-password flow
+  const [showForgot, setShowForgot] = useState(false)
+  const [resetEmail, setResetEmail] = useState("")
+  const [resetStatus, setResetStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
+  const [resetMsg, setResetMsg] = useState("")
+
+  const handleForgot = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setResetStatus("sending")
+    setResetMsg("")
+    try {
+      const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail || email }),
+      })
+      const data = await response.json()
+      if (response.ok) {
+        setResetStatus("sent")
+        setResetMsg(data.message || "If an account exists, a reset link has been sent.")
+      } else {
+        setResetStatus("error")
+        setResetMsg(data.message || "Something went wrong. Please try again.")
+      }
+    } catch (error) {
+      console.error("Forgot password failed:", error)
+      setResetStatus("error")
+      setResetMsg("Cannot connect to the server. Please try again later.")
+    }
+  }
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault() 
     setLoading(true)
@@ -148,7 +179,62 @@ export function LoginScreen() {
               >
                 {loading ? t("login.signingIn") : t("login.signIn")}
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgot((v) => !v)
+                  setResetEmail(email)
+                  setResetStatus("idle")
+                  setResetMsg("")
+                }}
+                className="w-full text-center text-sm text-primary font-medium hover:underline mt-1"
+              >
+                Forgot password?
+              </button>
             </form>
+
+            {/* Forgot-password panel */}
+            {showForgot && (
+              <div className="mt-5 pt-5 border-t border-border animate-fade-in-up">
+                {resetStatus === "sent" ? (
+                  <div className="text-center space-y-2 py-2">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-primary">
+                      <Mail className="w-6 h-6" />
+                    </div>
+                    <p className="text-sm text-foreground font-medium">Check your inbox</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{resetMsg}</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgot} className="space-y-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Enter your email and we'll send you a link to reset your password.
+                    </p>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input
+                        type="email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        placeholder={t("login.email")}
+                        className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    {resetStatus === "error" && (
+                      <p className="text-xs text-destructive">{resetMsg}</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={resetStatus === "sending"}
+                      className="w-full h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center gap-2 text-sm font-semibold hover:bg-primary/15 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                      {resetStatus === "sending" ? "Sending…" : "Send reset link"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
 
             {/* <div className="relative flex items-center py-4">
               <div className="flex-grow border-t border-border"></div>
