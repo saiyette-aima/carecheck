@@ -54,9 +54,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 //multer configuation
+const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
+if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "../uploads/");
+        cb(null, UPLOADS_DIR);
     },
     filename: (req, file, cb) => { 
         cb(null, file.originalname);
