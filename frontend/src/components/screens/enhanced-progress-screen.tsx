@@ -130,14 +130,6 @@ export function ProgressScreen() {
               </div>
             </div>
           </div>
-          <div className="relative z-10 flex items-center gap-4 mt-8 pt-8 border-t border-outline-variant/20">
-            <div className="flex -space-x-2">
-              <div className="w-10 h-10 rounded-full border-2 border-surface-container-low bg-primary-fixed flex items-center justify-center text-primary"><MSym name="person" fill className="text-lg" /></div>
-              <div className="w-10 h-10 rounded-full border-2 border-surface-container-low bg-secondary-fixed flex items-center justify-center text-[#6f5959]"><MSym name="person" fill className="text-lg" /></div>
-              <div className="w-10 h-10 rounded-full border-2 border-surface-container-low bg-tertiary-fixed flex items-center justify-center text-[10px] font-bold">+12</div>
-            </div>
-            <p className="font-body-md text-on-surface-variant italic opacity-70">Join 4,200 others in the care community.</p>
-          </div>
         </div>
 
         {/* Next check + reminders */}

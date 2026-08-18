@@ -16,12 +16,16 @@ function MSym({ name, className = "", fill = false, style }: { name: string; cla
   )
 }
 
+// Personal cancer-awareness website — link goes live once the site is active.
+// TODO: replace with the real URL when it's ready.
+const CANCER_AWARENESS_URL = "#"
+
 const features = [
   { icon: "mic", title: "Audio-guided self-exams", body: "Follow simple voice instructions step by step. Our soothing audio guides ensure you never miss a spot while keeping you calm.", radius: "organic-radius-1", iconBg: "bg-primary-fixed/40", iconColor: "text-primary" },
-  { icon: "smart_toy", title: "AI-powered summaries", tag: "Latest Innovation", body: "Get clear, easy to understand summaries of your self-exam results. No medical jargon, just plain language insights.", radius: "organic-radius-2", elevated: true, iconBg: "bg-primary", iconColor: "text-on-primary" },
-  { icon: "description", title: "Simplified medical reports", body: "Upload your reports and receive plain language explanations. We bridge the gap between technical data and personal understanding.", radius: "organic-radius-3", iconBg: "bg-secondary-fixed/60", iconColor: "text-secondary" },
+  { icon: "smart_toy", title: "AI-powered summaries", tag: "Latest Innovation", body: "Get clear, easy to understand summaries of your self-exam results. No medical jargon, just plain language insights.", radius: "organic-radius-2", iconBg: "bg-primary-fixed/40", iconColor: "text-primary" },
+  { icon: "description", title: "Simplified medical reports", body: "Upload your reports and receive plain language explanations. We bridge the gap between technical data and personal understanding.", radius: "organic-radius-3", iconBg: "bg-secondary-fixed/60", iconColor: "text-primary" },
   { icon: "notifications_active", title: "Monthly reminders", body: "Gentle reminders to help you stay consistent. Choose your preferred frequency and tone for a supportive nudge.", radius: "organic-radius-2", offset: "lg:col-start-1 lg:translate-x-1/2 lg:mt-6", iconBg: "bg-primary-fixed/40", iconColor: "text-primary" },
-  { icon: "location_on", title: "Find nearby clinics", body: "Locate nearby hospitals and clinics when you need professional care. Integrated map services with verified wellness centers.", radius: "organic-radius-1", offset: "lg:col-start-2 lg:translate-x-1/2 lg:mt-6", iconBg: "bg-secondary-fixed/60", iconColor: "text-secondary" },
+  { icon: "location_on", title: "Find nearby clinics", body: "Locate nearby hospitals and clinics when you need professional care. Integrated map services with verified wellness centers.", radius: "organic-radius-1", offset: "lg:col-start-2 lg:translate-x-1/2 lg:mt-6", iconBg: "bg-secondary-fixed/60", iconColor: "text-primary" },
 ]
 
 export function LandingScreen() {
@@ -81,10 +85,7 @@ export function LandingScreen() {
             <span className="font-headline-lg text-title-md font-bold text-primary">CareCheck</span>
           </div>
           <div className="hidden md:flex items-center gap-10">
-            <button onClick={start} className="text-primary font-bold border-b-2 border-primary pb-1 text-body-md">Dashboard</button>
-            <button onClick={start} className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 text-body-md">Self-Check</button>
-            <button onClick={start} className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 text-body-md">History</button>
-            <button onClick={start} className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300 text-body-md">Community</button>
+            <a href={CANCER_AWARENESS_URL} target="_blank" rel="noopener noreferrer" className="text-primary font-bold border-b-2 border-primary pb-1 text-body-md hover:opacity-80 transition-opacity">Cancer Awareness</a>
           </div>
           <div className="flex items-center gap-6">
             <button onClick={() => navigate("/login")} className="hidden sm:block text-on-surface-variant font-semibold hover:text-primary transition-colors duration-300">{t("login.signIn")}</button>
@@ -115,29 +116,14 @@ export function LandingScreen() {
                   Start Journey
                   <MSym name="arrow_forward" className="group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button onClick={() => navigate("/login")} className="border-2 border-outline-variant text-on-surface px-10 py-5 rounded-full font-bold hover:bg-surface-container transition-all">
-                  Learn How It Works
-                </button>
               </div>
             </div>
 
             <div className="md:col-span-6 lg:col-span-7 relative mt-12 md:mt-0 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
               <div className="relative w-full aspect-square md:aspect-auto md:h-[560px] flex items-center justify-center">
                 <div className="parallax-blob absolute inset-0 bg-primary-fixed/25 organic-blob -rotate-3 scale-105" />
-                <div className="relative z-20 w-[78%] aspect-square rounded-[3rem] bg-gradient-to-br from-surface-container-lowest via-secondary-fixed/40 to-primary-fixed/50 shadow-layered-hero flex items-center justify-center overflow-hidden border border-outline-variant/30 hover:scale-[1.02] transition-transform duration-700">
-                  <MSym name="volunteer_activism" fill className="text-[210px] text-primary/90 drop-shadow-lg animate-float" />
-                </div>
-                {/* Floating badge */}
-                <div className="absolute -top-2 right-4 bg-surface-container-lowest/95 backdrop-blur shadow-layered-hero p-5 rounded-3xl border border-outline-variant/30 z-30 animate-float">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-fixed/50 flex items-center justify-center">
-                      <MSym name="verified" className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-label-sm font-bold text-on-surface/60">Trusted by</p>
-                      <p className="text-body-md font-bold text-on-surface">12k+ Caregivers</p>
-                    </div>
-                  </div>
+                <div className="relative z-20 w-[82%] aspect-square rounded-[3rem] shadow-layered-hero overflow-hidden border border-outline-variant/30 hover:scale-[1.02] transition-transform duration-700">
+                  <img src="/images/hero-selfcare.jpg" alt="A woman calmly performing a guided self-check at home" className="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -244,23 +230,6 @@ export function LandingScreen() {
           </div>
         </section>
 
-        {/* ── CTA ── */}
-        <section className="py-32">
-          <div className="max-w-5xl mx-auto px-safe-margin text-center">
-            <div className="bg-primary-container text-on-primary-container rounded-[80px] p-14 md:p-28 relative overflow-hidden shadow-layered-hero">
-              <h2 className="font-headline-lg text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight">Small checks today can make a difference tomorrow.</h2>
-              <p className="font-body-lg text-body-lg mb-14 max-w-2xl mx-auto opacity-90">
-                Join 100,000+ women taking charge of their health with compassion and clarity.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <input className="w-full sm:w-auto min-w-[320px] px-10 py-5 rounded-full bg-surface-container-lowest text-on-surface border-none focus:ring-4 focus:ring-primary-fixed/50 transition-all text-center sm:text-left outline-none" placeholder="Where can we reach you?" type="email" />
-                <button onClick={start} className="bg-on-primary-container text-primary px-12 py-5 rounded-full font-bold hover:bg-surface-bright hover:scale-105 transition-all shadow-layered-cta whitespace-nowrap">
-                  Keep Me Updated
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* ── Footer ── */}

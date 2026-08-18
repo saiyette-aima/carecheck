@@ -168,8 +168,6 @@ export function DoctorFeedbackScreen() {
               {Array.from({ length: 24 }).map((_, i) => (<div key={i} className={`w-1 rounded-full ${isRecording ? "bg-primary" : "bg-success"}`} style={{ animation: isRecording ? `wave-bar 0.8s ease-in-out infinite` : "none", animationDelay: isRecording ? `${i * 40}ms` : "0ms", height: isRecording ? undefined : `${12 + Math.random() * 24}px` }} />))}
             </div>
           )}
-          {!hasRecording && !isRecording && !analyzing && (<div className="bg-secondary/50 rounded-xl p-5 text-center"><p className="text-sm text-foreground leading-relaxed">{t("doc.micHint")}</p></div>)}
-          
           {analyzedAdvice && (
             <div className="bg-secondary/20 rounded-xl p-5 border border-border/80 mb-6">
               <p className="text-[11px] uppercase tracking-wider text-primary font-bold mb-2">{t("doc.aiAnalysis")}</p>
