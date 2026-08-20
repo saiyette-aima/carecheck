@@ -299,7 +299,7 @@ app.get("/report",async(req:Request,res:Response):Promise<any>=>{
             "content": sysins(arr_transcript)
             }
         ],
-        "model": "llama-3.3-70b-versatile",
+        "model": "groq/compound-mini",
         "temperature": 0,
         "max_completion_tokens": 150,
         "top_p": 1,
@@ -515,7 +515,7 @@ app.post("/doctors",upload.single("audio"),async(req:Request,res:Response):Promi
             "content": sysDoc(transcript?.text || "")
             }
         ],
-        "model": "llama-3.3-70b-versatile",
+        "model": "groq/compound-mini",
         "temperature": 0,
         "max_completion_tokens": 600,
         "top_p": 1,
