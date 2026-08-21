@@ -148,7 +148,8 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
         method: "POST",
         headers: {
           "userId": userId || "guest-user",
-          "type": currentKey === "painOrDischarge" ? "Pain" : currentKey
+          "type": currentKey === "painOrDischarge" ? "Pain" : currentKey,
+          "language": language
         },
         body: formData
       })
@@ -163,7 +164,13 @@ export function QuestionScreen({ questionNumber, title, subtitle }: QuestionScre
           [currentKey]: true // Mark as answered/has content
         })
       } else {
-        alert(t("q.transcribeFailed", "Transcription failed. Please try again or type/use buttons."))
+        let reason = ""
+        try { reason = (await response.json())?.reason } catch { /* ignore */ }
+        if (reason === "no_speech") {
+          alert(t("q.noSpeech", "We couldn't hear anything. Please record again and speak clearly, or use the Yes/No buttons."))
+        } else {
+          alert(t("q.transcribeFailed", "Transcription failed. Please try again or type/use buttons."))
+        }
       }
     } catch (e) {
       console.error(e)

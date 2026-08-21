@@ -78,7 +78,8 @@ export function DoctorFeedbackScreen() {
       const response = await fetch(`${API_BASE_URL}/doctors`, {
         method: "POST",
         headers: {
-          "userId": userId || "guest-user"
+          "userId": userId || "guest-user",
+          "language": language
         },
         body: formData
       })

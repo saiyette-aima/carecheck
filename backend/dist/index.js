@@ -177,26 +177,52 @@ app.post('/reset-password', async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 });
+// Map the app's UI language to an AssemblyAI language code.
+// Passing an explicit language_code skips AssemblyAI's automatic
+// language-detection step, which errors on short / quiet recordings
+// ("language_detection cannot be performed on files with no spoken audio").
+function toAssemblyLang(lang) {
+    switch ((lang || "").toLowerCase()) {
+        case "hi": return "hi";
+        case "zh": return "zh";
+        case "ar": return "ar";
+        default: return "en";
+    }
+}
 //transribe via assembly ai STT
 app.post('/transcribe', upload.single("voice"), async (req, res) => {
     const voice = req.file;
     const userId = req.header('userId');
     const type = req.header('type');
+    const language = req.header('language');
     const textOverride = req.body?.text;
-    console.log(`[Transcribe] userId: ${userId}, type: ${type}, textOverride: ${textOverride}, file: ${voice ? voice.filename : "none"}`);
+    console.log(`[Transcribe] userId: ${userId}, type: ${type}, language: ${language}, textOverride: ${textOverride}, file: ${voice ? voice.filename : "none"}`);
     try {
         let transcriptText = "";
         if (voice) {
             const transcript = await client.transcripts.transcribe({
                 audio: voice.path,
-                speech_models: ["universal-3-pro", "universal-2"]
+                speech_models: ["universal-3-pro", "universal-2"],
+                language_code: toAssemblyLang(language)
             });
             fs.unlinkSync(voice.path);
             if (transcript.status === "error") {
                 console.error('Transcription failed:', transcript.error);
-                return res.status(501).json({ "message": "Transcription Failed" });
+                // No speech / empty clip → tell the client to retry instead of a hard failure.
+                const noSpeech = /no spoken audio|no speech/i.test(transcript.error || "");
+                return res.status(noSpeech ? 422 : 501).json({
+                    "message": noSpeech ? "No speech detected. Please record again and speak clearly." : "Transcription Failed",
+                    "reason": noSpeech ? "no_speech" : "error"
+                });
             }
             transcriptText = transcript.text || "";
+            // A successful transcription with empty text also means nothing was said.
+            if (!transcriptText.trim()) {
+                return res.status(422).json({
+                    "message": "No speech detected. Please record again and speak clearly.",
+                    "reason": "no_speech"
+                });
+            }
         }
         else if (textOverride) {
             transcriptText = textOverride;
@@ -248,16 +274,13 @@ function sysins(response) {
     3. Whether medical follow-up is recommended
     
     Keep the answer short and easy to understand.Summary should strictly be within 100 words.
-    
+
     Return this object
     {
      "summary":string,
      "isdoctorcheckadvised":string
     }
     No markdown in the output.
-    
-    Transcripts:- 
-    ${JSON.stringify(response, null, 2)}
     `;
     return system_instruction;
 }
@@ -280,9 +303,13 @@ app.get("/report", async (req, res) => {
                 {
                     "role": "system",
                     "content": sysins(arr_transcript)
+                },
+                {
+                    "role": "user",
+                    "content": `Here are the 3 transcripts to analyze:\n${JSON.stringify(arr_transcript, null, 2)}`
                 }
             ],
-            "model": "llama-3.3-70b-versatile",
+            "model": "groq/compound-mini",
             "temperature": 0,
             "max_completion_tokens": 150,
             "top_p": 1,
@@ -470,8 +497,6 @@ function sysDoc(report) {
     -If the report includes unclear or incomplete wording, state that some parts may need clarification from a medical professional
 
     -Output a string , no markdown
-    Transcript-
-    ${report}
     `;
     return systemInstruction;
 }
@@ -479,12 +504,14 @@ function sysDoc(report) {
 app.post("/doctors", upload.single("audio"), async (req, res) => {
     const audio = req.file;
     const userId = req.header('userId');
+    const language = req.header('language');
     try {
         let transcript;
         if (audio) {
             transcript = await client.transcripts.transcribe({
                 audio: audio.path,
-                speech_models: ["universal-3-pro", "universal-2"]
+                speech_models: ["universal-3-pro", "universal-2"],
+                language_code: toAssemblyLang(language)
             });
             fs.unlinkSync(audio.path);
         }
@@ -493,9 +520,13 @@ app.post("/doctors", upload.single("audio"), async (req, res) => {
                 {
                     "role": "system",
                     "content": sysDoc(transcript?.text || "")
+                },
+                {
+                    "role": "user",
+                    "content": `Here is the doctor's report/clinical notes to simplify:\n${transcript?.text || ""}`
                 }
             ],
-            "model": "llama-3.3-70b-versatile",
+            "model": "groq/compound-mini",
             "temperature": 0,
             "max_completion_tokens": 600,
             "top_p": 1,
