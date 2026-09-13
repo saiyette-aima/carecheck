@@ -250,6 +250,32 @@ export function LandingScreen() {
           <p className="text-on-secondary-fixed-variant opacity-60 font-body-md text-body-md max-w-lg mb-10 leading-relaxed">
             DISCLAIMER: CareCheck is an educational and awareness tool. It does not diagnose medical conditions or replace professional medical advice.
           </p>
+          <div className="mb-8">
+            <p className="text-on-surface-variant text-sm mb-3">
+              Designed &amp; developed by{" "}
+              <span className="font-semibold text-primary">Saiyette Aima</span>
+            </p>
+          
+            <div className="flex items-center justify-center gap-5">
+              <a
+                href="www.linkedin.com/in/saiyette-aima-166517376"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-on-surface-variant hover:text-primary transition-colors"
+              >
+                LinkedIn
+              </a>
+          
+              <span className="opacity-30">•</span>
+          
+              <a
+                href="mailto:pinkforpurpose@gmail.com"
+                className="text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Email
+              </a>
+            </div>
+          </div>
           <div className="font-label-sm text-[10px] text-on-secondary-fixed-variant uppercase tracking-[0.3em] opacity-40">
             © {new Date().getFullYear()} CareCheck. All rights reserved.
           </div>
