@@ -258,7 +258,7 @@ export function LandingScreen() {
           
             <div className="flex items-center justify-center gap-5">
               <a
-                href="www.linkedin.com/in/saiyette-aima-166517376"
+                href="https://www.linkedin.com/in/saiyette-aima-166517376"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-on-surface-variant hover:text-primary transition-colors"
