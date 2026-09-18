@@ -251,7 +251,7 @@ export function LandingScreen() {
             DISCLAIMER: CareCheck is an educational and awareness tool. It does not diagnose medical conditions or replace professional medical advice.
           </p>
           <div className="mb-8">
-            <p className="text-on-surface-variant text-lg mb-3">
+            <p className="text-on-surface-variant text-xl mb-3">
               Designed &amp; developed by{" "}
               <span className="font-semibold text-primary">Saiyette Aima</span>
             </p>
