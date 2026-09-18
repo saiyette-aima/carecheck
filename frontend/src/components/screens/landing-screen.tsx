@@ -276,7 +276,7 @@ export function LandingScreen() {
               </a>
             </div>
           </div>
-          <div className="font-label-sm text-[10px] text-on-secondary-fixed-variant uppercase tracking-[0.3em] opacity-40">
+          <div className="font-label-sm text-[15px] text-on-secondary-fixed-variant uppercase tracking-[0.3em] opacity-40">
             © {new Date().getFullYear()} CareCheck. All rights reserved.
           </div>
         </div>
